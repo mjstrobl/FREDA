@@ -1,0 +1,5 @@
+{
+  "database": "database/main.db",
+  "ip": "127.0.0.1",
+  "port": 4444
+}
