@@ -1,4 +1,72 @@
 database/main.db
+.idea/
+
+application/app/build.gradle
+application/app/proguard-rules.pro
+application/build.gradle
+application/gradle.properties
+application/gradle/wrapper/gradle-wrapper.jar
+application/gradle/wrapper/gradle-wrapper.properties
+application/gradlew
+application/gradlew.bat
+application/settings.gradle
+
+
+# Built application files
+/*/build/
+
+# Crashlytics configuations
+com_crashlytics_export_strings.xml
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+
+application/app/build.gradle
+application/app/proguard
+
+# Gradle generated files
+.gradle/
+
+# Signing files
+.signing/
+
+# User-specific configurations
+.idea/libraries/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/.name
+.idea/compiler.xml
+.idea/copyright/profiles_settings.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
+*.iml
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+
+gradle
+**/build/
+!src/**/build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
