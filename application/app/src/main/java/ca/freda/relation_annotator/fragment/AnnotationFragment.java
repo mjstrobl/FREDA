@@ -120,8 +120,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 relationTextView.setText("Relation: " + currentRelationInfo);
                 uidTextView.setText(activity.getUID());
 
-                Iterator<String> keys = activity.getRelation().getJSONObject("response").keys();
-
                 HorizontalScrollView scrollView = rootView.findViewById(R.id.response_scrollview);
                 scrollView.removeAllViews();
 
@@ -130,17 +128,21 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 layout.setId(R.id.entity_scrollview_layout);
                 layout.setOrientation(LinearLayout.HORIZONTAL);
 
+
+                // For different tasks it is possible to use different responses, for now yes/no (apart from ignore/remove) is enough.
+                Map<String,Integer> possibleResponses = new HashMap<>();
+                possibleResponses.put("yes",1);
+                possibleResponses.put("no",0);
+
                 responseButtons = new ArrayList<>();
 
-                while(keys.hasNext()) {
-                    String key = keys.next();
-                    String value = activity.getRelation().getJSONObject("response").getString(key);
+                for ( String key : possibleResponses.keySet()) {
+                    int value = possibleResponses.get(key);
 
                     Button button = new Button(getActivity());
                     button.setTypeface(null, Typeface.NORMAL);
-                    button.setTag(Integer.parseInt(key));
-                    //button.setText(value);
-                    SpannableString spanString = new SpannableString(value.toUpperCase());
+                    button.setTag(value);
+                    SpannableString spanString = new SpannableString(key.toUpperCase());
                     spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
                     button.setText(spanString);
                     button.setAllCaps(true);

@@ -26,7 +26,7 @@ public class ClientHandler extends Handler {
     private MainActivity mainActivity;
 
     private static final int SERVERPORT = 4444;
-    private static final String SERVER_IP = "127.0.0.1";
+    private static final String SERVERIP = "";
 
     public ClientHandler(Looper myLooper, MainActivity mainActivity) {
         super(myLooper);
@@ -91,7 +91,7 @@ public class ClientHandler extends Handler {
 
     private boolean connect() {
         try {
-            InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+            InetAddress serverAddr = InetAddress.getByName(SERVERIP);
             socket = new Socket(serverAddr, SERVERPORT);
             System.out.println(socket);
 

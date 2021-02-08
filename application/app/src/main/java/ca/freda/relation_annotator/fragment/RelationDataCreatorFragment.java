@@ -111,9 +111,6 @@ public class RelationDataCreatorFragment extends Fragment implements View.OnClic
             int annotations_twice = relation.getInt("twice");
             int annotations_full = relation.getInt("full");
             System.out.println(relation);
-            //JSONArray keywords = relation.getJSONArray("keywords");
-            JSONObject response = relation.getJSONObject("response");
-
 
             Button nameButton = new Button(activity);
             nameButton.setText(relationName);

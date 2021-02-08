@@ -74,8 +74,7 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
         }
 
-        //uid = "abcdefghijklmnopqrstuvwxyz";
-        //uid = "a3a2da99-a382-487b-bfbf-fafa64ee36e5";
+        //uid = "<SET UID>";
 
         System.out.println("UID: " + uid);
 
