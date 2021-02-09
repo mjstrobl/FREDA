@@ -1,5 +1,7 @@
 {
   "database": "database/main.db",
-  "ip": "127.0.0.1",
-  "port": 4444
+  "ip": "",
+  "port": 4444,
+  "wexea_path": "<WEXEA ARTICLE PATH>/*/",
+  "num_max_sentences": 10000
 }
