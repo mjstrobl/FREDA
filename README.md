@@ -55,7 +55,7 @@ Follow the instructions to start the server: https://stanfordnlp.github.io/CoreN
 ## Keywords
 
 1. Modify `database/keywords.json` and add new tuple with relation name, info (presentend in the app to make sure subject/object are annotated accordingly), direction of relation and list of keywords.
-2. Set `wexea_path` in `config/config.json`.
+2. De-compress `database/wexea.tar.xz` (contains 10,000 articles, should be replaced with original dataset for production system).
 3. Run `python database/sentence_extractor_keywords.py` (will take around 12h or longer, depending on how many keywords are used)
 
 ## Distant Supervision

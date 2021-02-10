@@ -11,6 +11,8 @@ application/gradlew
 application/gradlew.bat
 application/settings.gradle
 
+wexea_data_creator.py
+wexea/
 
 # Built application files
 /*/build/
