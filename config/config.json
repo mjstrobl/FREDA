@@ -2,7 +2,7 @@
   "database": "database/main.db",
   "ip": "",
   "port": 4444,
-  "wexea_path": "<WEXEA ARTICLE PATH>/*/",
+  "wexea_path": "database/wexea/*/",
   "num_max_sentences": 10000,
   "tdbstore": "<PATH TO JENA DBPEDIA RDF STORE>",
   "jena_jdbc": "<PATH>/jena-jdbc-driver-bundle-3.17.0.jar"
