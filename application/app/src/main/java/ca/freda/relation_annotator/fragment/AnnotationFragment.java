@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 public class AnnotationFragment extends Fragment implements View.OnClickListener {
@@ -322,7 +323,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             System.out.println("subjects: " + subjects );
             System.out.println("objects: " + objects );
 
-            int currentColour = 0;
             Set<Integer> occupiedPositions = new HashSet<>();
             for(int i = 0; i < annotations.length(); i++) {
                 JSONObject annotation = annotations.getJSONObject(i);
@@ -364,12 +364,9 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                     }
                 }
                 if (positions.size() > 0) {
-                    data.addEntity(currentColour, property, positions);
-                    usedColours.add(currentColour);
-                    currentColour += 1;
-                    if (currentColour == htmlColours.length) {
-                        currentColour = 0;
-                    }
+                    int colour = getNewEntityColour();
+                    data.addEntity(colour, property, positions);
+                    usedColours.add(colour);
                 }
             }
 
@@ -673,6 +670,10 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 break;
             }
         }
+        if (colour == -1) {
+            colour = new Random().nextInt(htmlColours.length);
+            activity.showToast("Reusing colours!");
+        }
         return colour;
 
     }
@@ -728,14 +729,10 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             if (entityAttached == null) {
                 System.out.println("create new entity: " + word);
                 int colour = getNewEntityColour();
-                if (colour == -1) {
-                    activity.showToast("Cannot add more entities, must ignore this sentence!");
-                } else {
-                    List<Position> positions = new ArrayList<>();
-                    positions.add(new Position(start, length));
-                    data.addEntity(colour,EntityButtonProperty.NONE, positions);
-                    usedColours.add(colour);
-                }
+                List<Position> positions = new ArrayList<>();
+                positions.add(new Position(start, length));
+                data.addEntity(colour,EntityButtonProperty.NONE, positions);
+                usedColours.add(colour);
             } else {
                 entityAttached.addPosition(start, length, data);
             }

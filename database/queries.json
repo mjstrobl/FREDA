@@ -1,0 +1,21 @@
+[
+  {"relation": "alma_mater", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/almaMater> ?obj . }"]},
+  {"relation": "date_of_birth", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/birthYear> ?obj . }","SELECT * WHERE { ?sub <http://dbpedia.org/property/birthDate> ?obj . }"]},
+  {"relation": "place_of_birth", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/birthPlace> ?obj . }"]},
+  {"relation": "place_of_residence", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/residence> ?obj . }"]},
+  {"relation": "spouse", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/spouse> ?obj . }"]},
+  {"relation": "child_of", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/child> ?obj . }","SELECT * WHERE { ?sub <http://dbpedia.org/property/parents> ?obj . }"]},
+  {"relation": "date_of_death", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/deathDate> ?obj . }","SELECT * WHERE { ?sub <http://dbpedia.org/property/deathYear> ?obj . }"]},
+  {"relation": "place_of_death", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/deathPlace> ?obj . }"]},
+  {"relation": "educated_at", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/education> ?obj . }"]},
+  {"relation": "related_to", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/relative> ?obj . }"]},
+  {"relation": "nationality", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/nationality> ?obj . }"]},
+  {"relation": "subsidiary_of", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/subsidiary> ?obj . }"]},
+  {"relation": "founded", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/founders> ?obj . }"]},
+  {"relation": "headquarters", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/locationCity> ?obj . }"]},
+  {"relation": "employee_or_member_of", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/employer> ?obj . }"]},
+  {"relation": "award", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/award> ?obj . }"]},
+  {"relation": "political_affiliation", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/party> ?obj . }"]},
+  {"relation": "diagnosed_with", "queries": ["SELECT * WHERE { ?sub <http://dbpedia.org/property/deathCause> ?obj . }"]},
+  {"relation": "colleague", "queries": ["SELECT distinct ?sub ?obj WHERE { ?sub <http://dbpedia.org/property/employer> ?empl . ?obj <http://dbpedia.org/property/employer> ?empl . }"]}
+]
