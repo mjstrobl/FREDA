@@ -2,6 +2,8 @@
 
 Fast Relation Extraction Data Annotation
 
+Current database (`database/main.tar.xz`) contains at least 500 annotated sentences for 19 relations. In addition, four more relations are added without any annotations so far.
+
 # Get Started
 
 Decompress database in `database/`:
