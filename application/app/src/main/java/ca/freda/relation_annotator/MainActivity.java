@@ -1,12 +1,5 @@
 package ca.freda.relation_annotator;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,15 +8,21 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
 
-import ca.freda.relation_annotator.fragment.AnnotationFragment;
-import ca.freda.relation_annotator.fragment.RelationDataCreatorFragment;
-import ca.freda.relation_annotator.handler.ClientHandler;
-import ca.freda.relation_annotator.handler.ServerHandler;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.UUID;
+
+import ca.freda.relation_annotator.fragment.AnnotationFragment;
+import ca.freda.relation_annotator.fragment.RelationDataCreatorFragment;
+import ca.freda.relation_annotator.handler.ClientHandler;
+import ca.freda.relation_annotator.handler.ServerHandler;
 
 public class MainActivity extends AppCompatActivity {
 

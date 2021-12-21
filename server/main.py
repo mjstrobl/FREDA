@@ -6,6 +6,7 @@ from sqlite3 import Error
 
 from modules.annotation_manager import AnnotationManager
 from modules.relation_manager import RelationManager
+#from modules.user_manager import UserManager
 
 class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket,db_file):
@@ -17,6 +18,7 @@ class ClientThread(threading.Thread):
         self.clientAddress = clientAddress
         self.annotation_manager = AnnotationManager()
         self.relation_manager = RelationManager()
+        #self.user_manager = UserManager()
         print ("New connection added: ", self.clientAddress)
     def run(self):
         print ("Connection from : ", self.clientAddress)
@@ -25,8 +27,7 @@ class ClientThread(threading.Thread):
         loops = 0
         while True:
             loops += 1
-            if loops > 5:
-                #TODO: This is a hack that works, but has to be replaced soon. The problem is that sometimes messages from the client contain a newline, if multiple messages are sent at once.
+            if loops > 10:
                 break
             print('waiting for data')
             data = self.csocket.recv(2048)
@@ -63,10 +64,8 @@ class ClientThread(threading.Thread):
     def process_message(self, msg):
         d = json.loads(msg)
         errors = 0
-
-        # This can be used to message a specific device, e.g. in case they need to update the app.
-        if 'uid' in d and d['uid'] == "<SPECIFIC UID>" :
-            message = {"mode": -3, "message": "<MESSAGE TO CLIENT SHOWN AS A TOAST>"}
+        if 'uid' in d and d['uid'] == "abcdefghijklmnopqrstuvwxyz" :
+            message = {"mode": -3, "message": "Please update the app and note your UID before you annotate more. Please email that one to Michael!"}
             print(message)
             message = json.dumps(message) + '\n'
             self.csocket.send(bytes(message, 'UTF-8'))
@@ -105,7 +104,7 @@ class ClientThread(threading.Thread):
             print(e)
 
 def main():
-    config = json.load(open('config/config.json'))
+    config = json.load(open('../config/config.json'))
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -121,6 +120,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
 

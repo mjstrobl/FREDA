@@ -116,7 +116,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             TextView relationTextView = rootView.findViewById(R.id.relation_textview);
             TextView uidTextView = rootView.findViewById(R.id.uid_textview);
             try {
-                currentRelationInfo = activity.getRelation().getString("info");
+                currentRelationInfo = activity.getRelation().getString("info_short");
                 currentRelationName = activity.getRelation().getString("name");
                 relationTextView.setText("Relation: " + currentRelationInfo);
                 uidTextView.setText(activity.getUID());
@@ -311,6 +311,10 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             JSONArray annotations = currentServerMessage.getJSONArray("entities");
             JSONArray subjectsJson = currentServerMessage.getJSONArray("subjects");
             JSONArray objectsJson = currentServerMessage.getJSONArray("objects");
+
+            if (currentRelationName.contains("noentities")) {
+                annotations = new JSONArray();
+            }
 
             int annotator = currentServerMessage.getInt("annotator");
             TextView relationTextView = rootView.findViewById(R.id.relation_textview);
@@ -546,7 +550,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        int numColumns = 10;
+        int numColumns = 9;
 
         List<Map<String,Object>> words = data.getWords();
 
@@ -585,12 +589,22 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 rowIndex++;
             } else {
                 rowIndex = 1;
+
+                View emptyView = new View(getActivity());
+                TableRow.LayoutParams separatorLayoutParams = new TableRow.LayoutParams(80, 1);
+                separatorLayoutParams.setMargins(0, 0, 0, 0);
+                tableRow.addView(emptyView,separatorLayoutParams);
+
                 tableLayout.addView(tableRow);
                 tableRow = new TableRow(getActivity());
             }
         }
 
         if (rowIndex > 0) {
+            View emptyView = new View(getActivity());
+            TableRow.LayoutParams separatorLayoutParams = new TableRow.LayoutParams(80, 1);
+            separatorLayoutParams.setMargins(0, 0, 0, 0);
+            tableRow.addView(emptyView,separatorLayoutParams);
             tableLayout.addView(tableRow);
         }
 

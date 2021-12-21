@@ -1,4 +1,4 @@
-database/*.db
+database/*
 .idea/
 
 application/app/build.gradle
