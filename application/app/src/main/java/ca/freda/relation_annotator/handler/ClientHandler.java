@@ -26,8 +26,8 @@ public class ClientHandler extends Handler {
     private MainActivity mainActivity;
 
     private static final int SERVERPORT = 4444;
-    //private static final String SERVERIP = "199.116.235.147";
-    private static final String SERVERIP = "192.168.178.23";
+    private static final String SERVERIP = "199.116.235.147";
+    //private static final String SERVERIP = "192.168.178.23";
 
     public ClientHandler(Looper myLooper, MainActivity mainActivity) {
         super(myLooper);
@@ -84,7 +84,7 @@ public class ClientHandler extends Handler {
             System.out.println("got new line: " + input);
             Message msg = obtainMessage();
             msg.obj = input;
-            mainActivity.passMessageToServerHandler(msg);
+            mainActivity.comHandler.passMessageToServerHandler(msg);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

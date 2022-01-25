@@ -1,4 +1,4 @@
-package ca.freda.relation_annotator.fragment;
+package ca.freda.relation_annotator.fragment.CR;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,16 +12,15 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
-
-import ca.freda.relation_annotator.MainActivity;
-import ca.freda.relation_annotator.R;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class RelationDataCreatorFragment extends Fragment implements View.OnClickListener {
+import ca.freda.relation_annotator.MainActivity;
+import ca.freda.relation_annotator.R;
+import ca.freda.relation_annotator.fragment.OverviewFragment;
+
+public class CROverviewFragment extends OverviewFragment implements View.OnClickListener {
 
     private ViewGroup rootView;
     private MainActivity activity;
@@ -29,13 +28,14 @@ public class RelationDataCreatorFragment extends Fragment implements View.OnClic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = (ViewGroup) inflater.inflate(R.layout.relation_slide_page, container, false);
-        
-        rootView.findViewById(R.id.relation_get_button).setOnClickListener(this);
+        rootView = (ViewGroup) inflater.inflate(R.layout.cr_overview_slide_page, container, false);
+
+        rootView.findViewById(R.id.cr_get_button).setOnClickListener(this);
+        rootView.findViewById(R.id.button_main_menu).setOnClickListener(this);
 
         activity = (MainActivity) getActivity();
 
-        TextView uidTextView = rootView.findViewById(R.id.relation_uid_textview);
+        TextView uidTextView = rootView.findViewById(R.id.cr_uid_textview);
         uidTextView.setText(activity.getUID());
 
         return rootView;
@@ -44,16 +44,27 @@ public class RelationDataCreatorFragment extends Fragment implements View.OnClic
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.relation_get_button:
+            case R.id.cr_get_button:
                 ScrollView scrollView = rootView.findViewById(R.id.relations_scrollview);
                 scrollView.removeAllViews();
-                activity.sendMessageWithMode(5);
+                try {
+                    JSONObject message = new JSONObject();
+                    message.put("task", "CR");
+                    message.put("mode", 5);
+                    activity.comHandler.sendMessage(message);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case R.id.button_main_menu:
+                activity.setPagerItem(0);
+                break;
             default:
                 break;
         }
     }
 
-    public void showRelations(JSONArray relations)throws JSONException {
+    public void showTypes(JSONArray datasets)throws JSONException {
         TableLayout tableLayout = new TableLayout(activity);
         tableLayout.setOrientation(LinearLayout.VERTICAL);
         System.out.println("table layout: " + tableLayout);
@@ -63,7 +74,7 @@ public class RelationDataCreatorFragment extends Fragment implements View.OnClic
         TableRow tableRow = new TableRow(activity);
         tableRow.setBackgroundColor(Color.LTGRAY);
         TextView textView1 = new TextView(activity);
-        textView1.setText("Relation");
+        textView1.setText("Dataset");
         textView1.setTextSize(22);
 
         TextView textView2 = new TextView(activity);
@@ -101,16 +112,16 @@ public class RelationDataCreatorFragment extends Fragment implements View.OnClic
 
 
 
-        for (int i = 0; i < relations.length(); i++) {
-            final JSONObject relation = relations.getJSONObject(i);
-            final String relationName = relation.getString("name");
-            int annotations_1 = relation.getInt("annotations_1");
-            int annotations_2 = relation.getInt("annotations_2");
-            int annotations_3 = relation.getInt("annotations_3");
-            int annotations_once = relation.getInt("once");
-            int annotations_twice = relation.getInt("twice");
-            int annotations_full = relation.getInt("full");
-            System.out.println(relation);
+        for (int i = 0; i < datasets.length(); i++) {
+            final JSONObject dataset = datasets.getJSONObject(i);
+            final String relationName = dataset.getString("name");
+            int annotations_1 = dataset.getInt("annotations_1");
+            int annotations_2 = dataset.getInt("annotations_2");
+            int annotations_3 = dataset.getInt("annotations_3");
+            int annotations_once = dataset.getInt("once");
+            int annotations_twice = dataset.getInt("twice");
+            int annotations_full = dataset.getInt("full");
+            System.out.println(dataset);
 
             Button nameButton = new Button(activity);
             nameButton.setText(relationName);
@@ -118,8 +129,8 @@ public class RelationDataCreatorFragment extends Fragment implements View.OnClic
             nameButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.setRelation(relation);
-                    activity.setPagerItem(1);
+                    activity.comHandler.setCrDataset(dataset);
+                    activity.setPagerItem(6);
                 }
             });
 
@@ -157,3 +168,4 @@ public class RelationDataCreatorFragment extends Fragment implements View.OnClic
         scrollView.addView(tableLayout);
     }
 }
+

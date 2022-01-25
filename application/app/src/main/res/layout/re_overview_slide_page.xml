@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -15,15 +18,29 @@
             android:editable="false" />
 
         <Button
+            android:id="@+id/button_main_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Main menu" />
+
+        <Button
             android:id="@+id/relation_get_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Get Relations" />
 
-        <ScrollView
-            android:id="@+id/relations_scrollview"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
+            <ScrollView
+                android:id="@+id/relations_scrollview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+        </LinearLayout>
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,14 +5,13 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
-import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
 
-public class WordButtonOnTouchListener implements View.OnTouchListener {
+public class EntityButtonOnTouchListener implements View.OnTouchListener {
 
 
     public AnnotationFragment annotationFragment;
 
-    public WordButtonOnTouchListener(AnnotationFragment annotationFragment) {
+    public EntityButtonOnTouchListener(AnnotationFragment annotationFragment) {
         this.annotationFragment = annotationFragment;
     }
 
@@ -34,7 +33,7 @@ public class WordButtonOnTouchListener implements View.OnTouchListener {
             }
             case MotionEvent.ACTION_DOWN: {
                 //mainActivity.addEntityButtons();
-                ClipData item = ClipData.newPlainText("wordview_" + v.getTag(), "" + v.getTag());
+                ClipData item = ClipData.newPlainText("entity_" + v.getTag(), "" + v.getTag());
                 System.out.println("Item in action down: " + item);
                 View.DragShadowBuilder myShadow = new WordButtonDragShadowBuilder(v);
                 v.startDragAndDrop(item, myShadow, null, 0);

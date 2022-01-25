@@ -6,14 +6,15 @@ import android.view.View;
 
 import ca.freda.relation_annotator.data.Entity;
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
+import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
 
 public class WordButtonDragEventListener implements View.OnDragListener {
 
-    public AnnotationFragment mainActivity;
+    public AnnotationFragment annotationFragment;
     private Entity entity;
 
-    public WordButtonDragEventListener(AnnotationFragment mainActivity,Entity entity) {
-        this.mainActivity = mainActivity;
+    public WordButtonDragEventListener(AnnotationFragment annotationFragment, Entity entity) {
+        this.annotationFragment = annotationFragment;
         this.entity = entity;
     }
 
@@ -54,10 +55,10 @@ public class WordButtonDragEventListener implements View.OnDragListener {
                 int wordViewId = Integer.parseInt(tokens[tokens.length-1]);
 
                 System.out.println("Dropped view: " + wordViewId);
-                mainActivity.addEntity(wordViewId,entity);
+                annotationFragment.addEntity(wordViewId,entity);
 
 
-                mainActivity.reloadViews();
+                annotationFragment.reloadViews();
                 v.invalidate();
                 return true;
             }

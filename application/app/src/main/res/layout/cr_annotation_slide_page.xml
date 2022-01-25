@@ -18,7 +18,7 @@
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="0dp"
-            android:layout_height="150dp"
+            android:layout_height="155dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +31,7 @@
                 <LinearLayout
                     android:id="@+id/linearLayout"
                     android:layout_width="0dp"
-                    android:layout_height="150dp"
+                    android:layout_height="155dp"
                     android:layout_marginEnd="100dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -92,14 +92,15 @@
                         android:id="@+id/entity_scrollview"
                         android:layout_width="match_parent"
                         android:layout_height="45dp"
-                        android:layout_marginRight="3dp" />
+                        android:layout_marginRight="3dp"
+                        tools:ignore="SpeakableTextPresentCheck" />
 
                 </LinearLayout>
 
                 <View
                     android:id="@+id/view4"
                     android:layout_width="1dp"
-                    android:layout_height="150dp"
+                    android:layout_height="155dp"
                     android:background="#918C8C"
                     android:backgroundTint="#918C8C"
                     app:layout_constraintEnd_toEndOf="@+id/linearLayout"
@@ -107,7 +108,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="100dp"
-                    android:layout_height="150dp"
+                    android:layout_height="155dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -230,7 +231,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="SpeakableTextPresentCheck">
 
             </HorizontalScrollView>
 

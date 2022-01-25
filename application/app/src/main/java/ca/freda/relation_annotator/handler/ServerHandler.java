@@ -13,8 +13,8 @@ public class ServerHandler extends Handler {
 
     private MainActivity mainActivity;
 
-    public ServerHandler(Looper myLooper, MainActivity mainActivity) {
-        super(myLooper);
+    public ServerHandler(Looper mainLooper, MainActivity mainActivity) {
+        super(mainLooper);
         this.mainActivity = mainActivity;
     }
 
@@ -29,7 +29,7 @@ public class ServerHandler extends Handler {
         } catch (NullPointerException ex) {
             ex.printStackTrace();
             mainActivity.showToast("Null pointer exception, please reload sentence or restart the app!");
-            mainActivity.restartClient();
+            mainActivity.comHandler.restartClient();
 
         }
     }
