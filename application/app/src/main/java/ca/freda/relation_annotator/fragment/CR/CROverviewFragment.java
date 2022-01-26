@@ -129,7 +129,7 @@ public class CROverviewFragment extends OverviewFragment implements View.OnClick
             nameButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.comHandler.setCrDataset(dataset);
+                    activity.comHandler.setDataset(dataset);
                     activity.setPagerItem(6);
                 }
             });

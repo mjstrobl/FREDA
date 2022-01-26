@@ -9,12 +9,13 @@ import androidx.core.content.ContextCompat;
 
 import ca.freda.relation_annotator.R;
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
+import ca.freda.relation_annotator.fragment.NER.NERAnnotationFragment;
 
 public class TypeButtonDragEventListener implements View.OnDragListener {
 
-    public AnnotationFragment annotationFragment;
+    public NERAnnotationFragment annotationFragment;
 
-    public TypeButtonDragEventListener(AnnotationFragment annotationFragment) {
+    public TypeButtonDragEventListener(NERAnnotationFragment annotationFragment) {
         this.annotationFragment = annotationFragment;
     }
 

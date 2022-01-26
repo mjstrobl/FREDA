@@ -78,6 +78,7 @@ public class EditNameDialogFragment extends DialogFragment {
                     NERAnnotationFragment nerAnnotationFragment = (NERAnnotationFragment) getTargetFragment();
                     nerAnnotationFragment.getData().getEntity(index).setType(type);
                     nerAnnotationFragment.fillEntityButtonScrollView();
+                    nerAnnotationFragment.fillTextView(false);
                     getDialog().dismiss();
                 }
             });

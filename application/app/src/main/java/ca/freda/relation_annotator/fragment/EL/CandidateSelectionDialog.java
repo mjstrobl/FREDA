@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import ca.freda.relation_annotator.R;
+import ca.freda.relation_annotator.data.EntityButtonProperty;
 import ca.freda.relation_annotator.fragment.NER.EditNameDialogFragment;
 import ca.freda.relation_annotator.fragment.NER.NERAnnotationFragment;
 
@@ -148,8 +149,10 @@ public class CandidateSelectionDialog extends DialogFragment {
                             elAnnotationFragment.getData().getEntity(index).setWikiName(null);
                         } else {
                             elAnnotationFragment.getData().getEntity(index).setWikiName(candidate);
+
                         }
                         elAnnotationFragment.fillEntityButtonScrollView();
+                        elAnnotationFragment.fillTextView(false);
                         getDialog().dismiss();
                     }
                 });

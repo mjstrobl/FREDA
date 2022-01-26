@@ -1,5 +1,5 @@
 database/*
-.json
+*.json
 .idea/
 
 application/app/build.gradle

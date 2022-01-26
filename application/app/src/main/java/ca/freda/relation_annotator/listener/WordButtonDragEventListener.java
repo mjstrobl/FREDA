@@ -58,7 +58,7 @@ public class WordButtonDragEventListener implements View.OnDragListener {
                 annotationFragment.addEntity(wordViewId,entity);
 
 
-                annotationFragment.reloadViews();
+                annotationFragment.reloadViews(true);
                 v.invalidate();
                 return true;
             }

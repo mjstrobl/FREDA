@@ -1,5 +1,6 @@
 package ca.freda.relation_annotator.fragment.NER;
 
+import android.annotation.SuppressLint;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -57,38 +58,18 @@ import ca.freda.relation_annotator.listener.WordButtonOnTouchListener;
 
 public class NERAnnotationFragment extends AnnotationFragment implements View.OnClickListener {
 
-    private JSONObject currentServerMessage;
-
-    private String currentDatasetName;
-    private MainActivity activity;
-    Button responseButton;
-
+    private float start;
     private Map<String,ArrayList<String>> typeHierarchy;
 
-    private ViewGroup rootView;
-
-    private float start;
-
-    private Data data;
-    private LinearLayout linearHorizontalScrollviewLayout;
-    //private String[] htmlColours = {"#009900","#0099ff","#ff5050","#9933ff","#ff8b33","#7e33ff","#260505","#220b80","#4bde7b","#65c900","#800046","#a65c46","#c0d40d"};
-    private String[] htmlColours = {"#e6194B", "#3cb44b", "#97850a", "#4363d8", "#f58231", "#911eb4", "#2c98b0", "#f032e6", "#5b9b22", "#cc6d91", "#30998e", "#9c63e1",
-            "#9A6324", "#7f7b54", "#800000", "#538963", "#808000", "#694d32", "#000075", "#5a5a5a", "#000000"};
-    private Set<Integer> usedColours = new HashSet<>();
-
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = (ViewGroup) inflater.inflate(R.layout.ner_annotation_slide_page, container, false);
-
-        activity = (MainActivity) getActivity();
-
-        HorizontalScrollView scrollView = rootView.findViewById(R.id.entity_scrollview);
-        EntityScrollviewDragEventListener scrollviewDragEventListener = new EntityScrollviewDragEventListener(this);
-        scrollView.setOnDragListener(scrollviewDragEventListener);
+        super.fillRootView();
 
         TextView textView = rootView.findViewById(R.id.textView);
-        textView.setOnDragListener(scrollviewDragEventListener);
+        HorizontalScrollView scrollView = rootView.findViewById(R.id.entity_scrollview);
         textView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -116,159 +97,27 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
             }
         });
 
-        GarbageViewDragEventListener garbageViewDragEventListener = new GarbageViewDragEventListener(this);
-        ImageButton trashButton = rootView.findViewById(R.id.trash);
-        trashButton.setOnDragListener(garbageViewDragEventListener);
-
-        rootView.findViewById(R.id.previous_button).setOnClickListener(this);
-        rootView.findViewById(R.id.annotation_remove_button).setOnClickListener(this);
-        rootView.findViewById(R.id.annotation_ignore_button).setOnClickListener(this);
-        rootView.findViewById(R.id.reload_button).setOnClickListener(this);
-        rootView.findViewById(R.id.main_button_annotation).setOnClickListener(this);
-
-
-        System.out.println("on create annotation fragment.");
-
         return rootView;
-    }
-
-    private void setTextViewText(String text) {
-        TextView textView = rootView.findViewById(R.id.textView);
-        textView.setText(text);
     }
 
 
     @Override
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
-        if (visible) {
-            TextView relationTextView = rootView.findViewById(R.id.relation_textview);
-            TextView uidTextView = rootView.findViewById(R.id.uid_textview);
-            try {
-                currentDatasetName = activity.comHandler.getNerDataset().getString("name");
-                uidTextView.setText(activity.getUID());
-
-                HorizontalScrollView scrollView = rootView.findViewById(R.id.response_scrollview);
-                scrollView.removeAllViews();
-
-                LinearLayout layout = new LinearLayout(getActivity());
-
-                layout.setId(R.id.entity_scrollview_layout);
-                layout.setOrientation(LinearLayout.HORIZONTAL);
-
-                responseButton = new Button(getActivity());
-                responseButton.setTypeface(null, Typeface.NORMAL);
-                responseButton.setTag(0);
-                SpannableString spanString = new SpannableString("Done");
-                spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
-                responseButton.setText(spanString);
-                responseButton.setAllCaps(true);
-                responseButton.setSingleLine(true);
-                responseButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        setTextViewText("Waiting for data, could take around 30 seconds.");
-                        sendSampleResponse((int)v.getTag());
-                    }
-                });
-                layout.addView(responseButton);
-
-
-                scrollView.addView(layout);
-
-                switchButtonState(false);
-
-
-                JSONObject message = new JSONObject();
-                message.put("task", "NER");
-                message.put("mode", 1);
-                activity.comHandler.sendMessage(message);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-            System.out.println("Annotation Fragment visible.");
-        }
     }
 
-    @Override
-    public void onClick(View view) {
-        System.out.println("onclick");
-        switch (view.getId()) {
-            case R.id.previous_button:
-                switchButtonState(false);
-                try {
-                    JSONObject message = new JSONObject();
-                    message.put("task", "NER");
-                    message.put("mode", 4);
-                    activity.comHandler.sendMessage(message);
-                    message.put("mode", 1);
-                    activity.comHandler.sendMessage(message);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case R.id.reload_button:
-                if (currentServerMessage == null) {
-                    try {
-                        JSONObject message = new JSONObject();
-                        message.put("task", "NER");
-                        message.put("mode", 1);
-                        activity.comHandler.sendMessage(message);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    createData(currentServerMessage);
-                }
-                break;
-            case R.id.main_button_annotation:
-                typeHierarchy = null;
-                activity.setPagerItem(1);
-                break;
-            case R.id.annotation_ignore_button:
-                sendSampleResponse(-1);
-                break;
-            case R.id.annotation_remove_button:
-                sendSampleResponse(-2);
-                break;
-            /*case R.id.relation_info_button:
-
-                AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create(); //Read Update
-                alertDialog.setTitle("How to annotate for this relation");
-                alertDialog.setMessage("It is always possible to have either one subject and one or more objects, or one object and one or more subjects. If the response is 'no', subject and object are ignored, therefore they don't have to be annotated, but can be left as is. Only say 'yes', if there's no alternative explanation possible, i.e. if the relation likely holds, but is not explicitly mentioned, the answer has to be 'no'. There's no need to annotate any entity that cannot participate in this relation, but there's also no need to remove those that cannot. Except that broken annotation should be fixed, e.g. if a word is missing or the entity itself is useless.");
-                alertDialog.setButton("Okay", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // here you can add functions
-                    }
-                });
-
-                alertDialog.show();  //<-- See This!
-
-                break;*/
-            default:
-                break;
-        }
+    protected Map<String,Integer> setPossibleResponses() {
+        Map<String,Integer> possibleResponses = new HashMap<>();
+        possibleResponses.put("done",0);
+        return possibleResponses;
     }
 
-    private void switchButtonState(boolean enabled) {
-        if (responseButton != null) {
-            rootView.findViewById(R.id.annotation_remove_button).setEnabled(enabled);
-            rootView.findViewById(R.id.annotation_ignore_button).setEnabled(enabled);
-            rootView.findViewById(R.id.main_button_annotation).setEnabled(enabled);
-            rootView.findViewById(R.id.reload_button).setEnabled(enabled);
-            rootView.findViewById(R.id.previous_button).setEnabled(enabled);
-            responseButton.setEnabled(enabled);
-        }
+    protected void setVariables() {
+        task = "NER";
+        overviewPagerItem = 1;
     }
 
-    /**
-     *
-     * @param sampleObject
-     * @throws JSONException
-     */
-    private void fillEntities(JSONObject sampleObject) throws JSONException {
+    protected void fillEntities(JSONObject sampleObject) throws JSONException {
         JSONArray entities = new JSONArray();
         for (int i = 0; i < data.getNumEntities(); i++) {
             Entity entity = data.getEntity(i);
@@ -285,44 +134,12 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
             JSONObject entityJSON = new JSONObject();
             entityJSON.put("name", entity.getName());
             entityJSON.put("positions",positionsJSON);
-            if (entity.getType() != null) {
+            if (entity.getProperty() == EntityButtonProperty.NERTYPE) {
                 entityJSON.put("type",entity.getType());
             }
             entities.put(entityJSON);
         }
         sampleObject.put("entities",entities);
-    }
-
-    private void sendSampleResponse(int response) {
-        switchButtonState(false);
-        Message msg = activity.comHandler.obtainMessage();
-
-        try {
-            if (msg != null) {
-                JSONObject sampleObject = new JSONObject();
-                sampleObject.put("mode", 2);
-                sampleObject.put("response", response);
-                sampleObject.put("dataset",currentDatasetName);
-                sampleObject.put("uid",activity.getUID());
-                sampleObject.put("article",currentServerMessage.getString("article"));
-                sampleObject.put("line",currentServerMessage.getInt("line"));
-                fillEntities(sampleObject);
-
-                msg.obj = sampleObject.toString();
-                System.out.println(msg.obj);
-                activity.comHandler.sendMessage(msg);
-            }
-
-            JSONObject message = new JSONObject();
-            message.put("task", "NER");
-            message.put("mode", 1);
-            activity.comHandler.sendMessage(message);
-
-        } catch (JSONException ex) {
-            ex.printStackTrace();
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
-        }
     }
 
     public void createData(JSONObject message) {
@@ -344,8 +161,7 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
             }
 
             int annotator = currentServerMessage.getInt("annotator");
-            TextView relationTextView = rootView.findViewById(R.id.relation_textview);
-            relationTextView.setText("Annotator: " + annotator + ", Dataset: " + currentDatasetName);
+            setDatasetTextviewText(annotator);
 
             Set<Integer> occupiedPositions = new HashSet<>();
             for(int i = 0; i < annotations.length(); i++) {
@@ -390,280 +206,13 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        reloadViews();
+        reloadViews(true);
         switchButtonState(true);
     }
 
-    private void fillTextView() {
-        if (data == null) {
-            setTextViewText("Waiting for data, could take around 30 seconds.");
-            return;
-        }
-
-
-        //text = before + "<b><u><font color='" + colour + "'>" + mention + "</font></u></b>" + after;
-        String sentence = data.getSentence();
-
-        //sort entity positions
-        List<Map<String,Object>> allPositions = new ArrayList<>();
-        for (int i = 0; i < data.getNumEntities(); i++) {
-            Entity entity = data.getEntity(i);
-            for (Position position : entity.getPositions()) {
-                int start = position.start;
-                int length = position.length;
-                Map<String,Object> entityPosition = new HashMap<>();
-                entityPosition.put("start",start);
-                entityPosition.put("length",length);
-                entityPosition.put("colour",entity.getColour());
-                entityPosition.put("property",entity.getProperty());
-                allPositions.add(entityPosition);
-            }
-        }
-
-        Collections.sort(allPositions, new Comparator<Map<String,Object>>(){
-
-            @Override
-            public int compare(Map<String,Object> p1, Map<String,Object> p2) {
-                int start1 = (int)p1.get("start");
-                int length1 = (int)p1.get("length");
-                int start2 = (int)p2.get("start");
-                int length2 = (int)p2.get("length");
-
-                if (start1 == start2) {
-                    return Integer.compare(length2, length1);
-                } else {
-                    return Integer.compare(start1, start2);
-                }
-            }
-
-        });
-
-        Map<Integer,List<Map<String,Object>>> allInnerPositions = new HashMap<>();
-        Set<Integer> innerPositionIndices = new HashSet<>();
-        for (int i = 0; i < allPositions.size() - 1; i++) {
-            if (!innerPositionIndices.contains(i)) {
-                Map<String, Object> outerPosition = allPositions.get(i);
-                int outerStart = (int) outerPosition.get("start");
-                int outerLength = (int) outerPosition.get("length");
-
-                for (int j = i + 1; j < allPositions.size(); j++) {
-                    if (!innerPositionIndices.contains(j)) {
-                        Map<String, Object> innerPosition = allPositions.get(j);
-                        int innerStart = (int) innerPosition.get("start");
-                        int innerLength = (int) innerPosition.get("length");
-
-                        if (innerStart >= outerStart && innerStart + innerLength <= outerStart + outerLength) {
-                            System.out.println("Inner position: " + sentence.substring(innerStart, innerStart + innerLength));
-                            if (!allInnerPositions.containsKey(i)) {
-                                allInnerPositions.put(i, new ArrayList<Map<String, Object>>());
-                            }
-                            allInnerPositions.get(i).add(innerPosition);
-                            innerPositionIndices.add(j);
-                        }
-                    }
-                }
-            }
-        }
-
-        for (Map.Entry<Integer, List<Map<String, Object>>> entry : allInnerPositions.entrySet()) {
-            Collections.sort(entry.getValue(), new Comparator<Map<String,Object>>(){
-
-                @Override
-                public int compare(Map<String,Object> p1, Map<String,Object> p2) {
-                    int start1 = (int)p1.get("start");
-                    int start2 = (int)p2.get("start");
-
-                    return Integer.compare(start1, start2);
-                }
-
-            });
-        }
-
-
-
-
-        for (int i = allPositions.size() - 1; i >= 0; i--) {
-            if (innerPositionIndices.contains(i)) {
-                continue;
-            }
-            int colour = (int)allPositions.get(i).get("colour");
-            int start = (int)allPositions.get(i).get("start");
-            int length = (int)allPositions.get(i).get("length");
-            EntityButtonProperty property = (EntityButtonProperty) allPositions.get(i).get("property");
-
-            String before = sentence.substring(0, start);
-            String after = sentence.substring(start + length);
-            String mention = sentence.substring(start, start + length);
-
-            System.out.println("Outer mention: " + mention);
-
-            if (allInnerPositions.containsKey(i)) {
-                StringBuilder mentionBuilder = new StringBuilder();
-                List<Map<String,Object>> innerPositions = allInnerPositions.get(i);
-                int alreadyProcessedIndex = 0;
-                for (int j = 0; j < innerPositions.size(); j++) {
-                    int innerStart = (int) innerPositions.get(j).get("start");
-                    int innerLength = (int) innerPositions.get(j).get("length");
-                    String firstPart = mention.substring(alreadyProcessedIndex,innerStart - start);
-                    String innerMentionPart = mention.substring(innerStart - start, innerStart - start + innerLength);
-                    String secondPart = mention.substring(innerStart - start + innerLength);
-
-                    System.out.println("first part: " + mention);
-                    System.out.println("innerMentionPart: " + innerMentionPart);
-                    System.out.println("secondPart: " + secondPart);
-
-
-
-                    mentionBuilder.append("<span style=\"color: ");
-                    mentionBuilder.append(htmlColours[colour]);
-                    mentionBuilder.append(";\">");
-                    mentionBuilder.append(firstPart);
-                    mentionBuilder.append("</span>");
-                    mentionBuilder.append("<span style=\"color: ");
-                    mentionBuilder.append(htmlColours[colour]);
-                    mentionBuilder.append("; background-color: ");
-                    mentionBuilder.append(htmlColours[(int) innerPositions.get(j).get("colour")]);
-                    mentionBuilder.append(";\">");
-                    mentionBuilder.append(innerMentionPart);
-                    mentionBuilder.append("</span>");
-                    alreadyProcessedIndex = innerStart - start + innerLength;
-                    if (j == innerPositions.size() - 1) {
-                        mentionBuilder.append("<span style=\"color: ");
-                        mentionBuilder.append(htmlColours[colour]);
-                        mentionBuilder.append(";\">");
-                        mentionBuilder.append(secondPart);
-                        mentionBuilder.append("</span>");
-                    }
-                }
-                mention = mentionBuilder.toString();
-            } else {
-                mention = "<span style=\"color: " + htmlColours[colour] + ";\">" + mention + "</span>";
-            }
-
-            if (property != EntityButtonProperty.NONE) {
-                sentence = before + "<b><u>" + mention + "</u></b>" + after;
-            } else {
-                sentence = before + "<b>" + mention + "</b>" + after;
-            }
-        }
-
-        System.out.println(sentence);
-        TextView textView = rootView.findViewById(R.id.textView);
-        textView.setText(Html.fromHtml(sentence,0));
-    }
-
-    private void fillWordButtonView() {
-        ScrollView scrollView = (ScrollView) rootView.findViewById(R.id.word_scrollview);
-        scrollView.removeAllViews();
-
-        if (data == null) {
-            return;
-        }
-
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-
-        int numColumns = 9;
-
-        List<Map<String,Object>> words = data.getWords();
-
-        TableLayout tableLayout = new TableLayout(getActivity());
-        tableLayout.setOrientation(LinearLayout.VERTICAL);
-        System.out.println("table layout: " + tableLayout);
-        tableLayout.setShrinkAllColumns(true);
-        tableLayout.setStretchAllColumns(true);
-
-        int index = 0;
-        int rowIndex = 1;
-        TableRow tableRow = new TableRow(getActivity());
-        while (index < words.size()) {
-            if (rowIndex <= numColumns) {
-                Button button = new Button(getActivity());
-
-                String buttonText = (String)words.get(index).get("word");
-
-                button.setText(buttonText);
-                button.setTag(index);
-                button.setEllipsize(TextUtils.TruncateAt.END);
-                button.setSingleLine(true);
-
-                button.setOnTouchListener(new WordButtonOnTouchListener(this));
-                List<Entity> entities = (List<Entity>)words.get(index).get("entities");
-                if (entities != null) {
-                    Entity entity = entities.get(0);
-                    int colour = entity.getColour();
-                    int btnColour = new BigInteger("AA" + htmlColours[colour].substring(1), 16).intValue();
-                    button.setTextColor(btnColour);
-                }
-                tableRow.addView(button);
-                index++;
-                rowIndex++;
-            } else {
-                rowIndex = 1;
-
-                View emptyView = new View(getActivity());
-                TableRow.LayoutParams separatorLayoutParams = new TableRow.LayoutParams(80, 1);
-                separatorLayoutParams.setMargins(0, 0, 0, 0);
-                tableRow.addView(emptyView,separatorLayoutParams);
-
-                tableLayout.addView(tableRow);
-                tableRow = new TableRow(getActivity());
-            }
-        }
-
-        if (rowIndex > 0) {
-            View emptyView = new View(getActivity());
-            TableRow.LayoutParams separatorLayoutParams = new TableRow.LayoutParams(80, 1);
-            separatorLayoutParams.setMargins(0, 0, 0, 0);
-            tableRow.addView(emptyView,separatorLayoutParams);
-            tableLayout.addView(tableRow);
-        }
-
-        scrollView.addView(tableLayout);
-    }
-
-    public void entityButtonClicked(int index, Button button) {
-        Entity entity = data.getEntity(index);
-        entity.increaseProperty();
-        setButtonLayout(button,entity);
-        fillTextView();
-        fillWordButtonView();
-    }
-
-    public void fillEntityButtonScrollView() {
-        HorizontalScrollView scrollView = rootView.findViewById(R.id.entity_scrollview);
-        scrollView.removeAllViews();
-
-        if (data == null) {
-            return;
-        }
-
-
-        System.out.println("fillEntityButtonScrollView");
-        System.out.println("num entities: " + data.getNumEntities());
-
-        LinearLayout layout = new LinearLayout(getActivity());
-        linearHorizontalScrollviewLayout = layout;
-
-        layout.setId(R.id.entity_scrollview_layout);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-
-        EntityViewLongClickListener longClickListener = new EntityViewLongClickListener();
-        for (int i = 0; i < data.getNumEntities(); i++) {
-            Entity entity = data.getEntity(i);
-            System.out.println(entity.toString());
-            Button button = new Button(getActivity());
-            button.setActivated(false);
-            button.setTypeface(null, Typeface.NORMAL);
-            button.setTag(i);
-            button.setOnTouchListener(new EntityButtonOnTouchListener(this));
-            button.setOnDragListener(new WordButtonDragEventListener(this,entity));
-            linearHorizontalScrollviewLayout.addView(button);
-
-            setButtonLayout(button,entity);
-        }
-
-        scrollView.addView(layout);
+    protected void setEntityButtonListeners(Button button) {
+        button.setOnTouchListener(new EntityButtonOnTouchListener(this));
+        button.setOnDragListener(new WordButtonDragEventListener(this,data.getEntity((int)button.getTag())));
     }
 
     private void fillTypeButtonScrollView() {
@@ -677,14 +226,15 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
 
             List<String> types = new ArrayList<>();
 
-            if (activity.comHandler.getNerDataset().get("system").equals("flat")) {
-                JSONArray typesJSON = activity.comHandler.getNerDataset().getJSONArray("types");
+            if (activity.comHandler.getDataset().get("system").equals("flat")) {
+                JSONArray typesJSON = activity.comHandler.getDataset().getJSONArray("types");
                 for (int i = 0; i < typesJSON.length(); i++) {
                     String type = typesJSON.getString(i);
                     types.add(type);
                 }
+                typeHierarchy = null;
             } else {
-                JSONObject typesJSON = activity.comHandler.getNerDataset().getJSONObject("types");
+                JSONObject typesJSON = activity.comHandler.getDataset().getJSONObject("types");
                 Iterator<String> keys = typesJSON.keys();
 
                 typeHierarchy = new HashMap<>();
@@ -732,218 +282,11 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
     }
 
 
-
-    private void setButtonLayout(Button button, Entity entity) {
-        int colour = entity.getColour();
-        System.out.println("colour: " + colour);
-        int btnColour = new BigInteger("AA" + htmlColours[colour].substring(1), 16).intValue();
-        button.setTextColor(btnColour);
-        button.setPaintFlags(button.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
-        button.setTypeface(null, Typeface.NORMAL);
-        if (entity.getType() != null) {
-            button.setText(entity.getName() + " (" + entity.getType() + ")");
-        } else {
-            button.setText(entity.getName());
+    public void reloadViews(boolean reloadData) {
+        super.reloadViews(reloadData);
+        if (reloadData) {
+            fillTypeButtonScrollView();
         }
-
-    }
-
-    public int getNewEntityColour() {
-        int colour = -1;
-        for (int i = 0; i < htmlColours.length; i++) {
-            if (!usedColours.contains(i)) {
-                colour = i;
-                break;
-            }
-        }
-        if (colour == -1) {
-            colour = new Random().nextInt(htmlColours.length);
-            activity.showToast("Reusing colours!");
-        }
-        return colour;
-
-    }
-
-    public void addEntity(int wordViewId, Entity entityAttached) {
-        // check if position is already part of entity
-        Map<String,Object> wordMap = data.getWords().get(wordViewId);
-        int start = (Integer)wordMap.get("start");
-        int length = (Integer)wordMap.get("length");
-        String word = (String)wordMap.get("word");
-        List<Entity> entities = (List<Entity>)wordMap.get("entities");
-
-        if (entities != null && entities.get(0) != entityAttached) {
-            int entityToRemove = -1;
-            for (int i = 0; i < data.getNumEntities(); i++) {
-                Entity entity = data.getEntity(i);
-                List<Position> positions = entity.getPositions();
-                int matchingPosition = -1;
-                for (int j = 0; j < positions.size(); j++) {
-                    Position position = positions.get(j);
-                    if (position.contains(start, length)) {
-                        matchingPosition = j;
-                        //activity.showToast("This word is already part of an entity!");
-                        //return;
-                    }
-                }
-                if (matchingPosition > -1) {
-                    positions.remove(matchingPosition);
-                    wordMap.remove("entities");
-                    entities = null;
-                }
-                if (positions.size() == 0) {
-                    entityToRemove = i;
-                    break;
-                }
-            }
-
-            if (entityToRemove > -1) {
-                data.removeEntity(entityToRemove);
-            }
-        }
-
-
-        if (entityAttached == null) {
-            System.out.println("Add new entity from word button");
-        } else {
-            System.out.println("Extend entity with word from word button.");
-        }
-
-
-
-        if (entities == null) {
-            if (entityAttached == null) {
-                System.out.println("create new entity: " + word);
-                int colour = getNewEntityColour();
-                List<Position> positions = new ArrayList<>();
-                positions.add(new Position(start, length));
-                data.addEntity(colour,EntityButtonProperty.NONE, positions);
-                usedColours.add(colour);
-            } else {
-                entityAttached.addPosition(start, length, data);
-            }
-        } else {
-            /*System.out.println("add inner position");
-            Entity entity = entities.get(0);
-            if (entityAttached != null) {
-                if (entity == entityAttached) {
-                    activity.showToast("This is the same entity!");
-                } else {
-                    activity.showToast("This word is already part of an entity!");
-                    //entity = data.getEntity(entityId);
-                    //entity.addPosition(start, length, data);
-                }
-            } else {
-                System.out.println("create new entity: " + word);
-                int colour = getNewEntityColour();
-                if (colour == -1) {
-                    activity.showToast("Cannot add more entities, must ignore this sentence!");
-                } else {
-                    List<Position> positions = new ArrayList<>();
-                    positions.add(new Position(start, length));
-                    data.addEntity(colour, EntityButtonProperty.NONE, positions);
-                    usedColours.add(colour);
-                }
-            }*/
-            activity.showToast("This word is already part of an entity!");
-        }
-
-        for (int i = 0; i < data.getNumEntities(); i++) {
-            data.getEntity(i).findName(data);
-        }
-
-    }
-
-    public void removeData() {
-        currentServerMessage = null;
-        switchButtonState(false);
-        data = null;
-        reloadViews();
-    }
-
-    public void reloadViews() {
-        if (data != null) {
-            data.createAnnotations();
-            data.createWords();
-        }
-        fillEntityButtonScrollView();
-        fillTypeButtonScrollView();
-        fillTextView();
-        fillWordButtonView();
-    }
-
-    public void removeWordFromPositions(int index) {
-        Map<String, Object> wordMap = data.getWords().get(index);
-        int start = (int) wordMap.get("start");
-        int length = (int) wordMap.get("length");
-        List<Entity> entities = (List<Entity>) wordMap.get("entities");
-        if (entities == null) {
-            activity.showToast("No entities to remove from this word!");
-        } else {
-            for (Entity entity : entities) {
-                List<Position> newPositions = new ArrayList<>();
-                for (Position position : entity.getPositions()) {
-                    if (!(position.start <= start && start + length <= position.start + position.length)) {
-                        newPositions.add(position);
-                    } else {
-                        System.out.println("CREATE NEW POSITION");
-                        System.out.println(position.start + ", " + position.length);
-                        System.out.println(start);
-                        System.out.println(length);
-                        if (start == position.start) {
-                            System.out.println("at start");
-                            //word button at beginning of position
-                            int newStart = start + length;
-                            int newLength = position.length - length;
-                            if (newStart < data.getSentence().length() && data.getSentence().charAt(newStart) == ' ') {
-                                newStart++;
-                                newLength--;
-                            }
-                            if (newStart >= 0 && newLength > 0) {
-                                newPositions.add(new Position(newStart, newLength));
-                            }
-                        } else if (start+length == position.start + position.length) {
-                            System.out.println("at end");
-                            //word button at the end of position
-                            int newStart = position.start;
-                            int newLength = position.length - length;
-
-                            if (data.getSentence().charAt(newStart + newLength - 1) == ' ') {
-                                newLength--;
-                            }
-
-                            if (newStart >= 0 && newLength > 0) {
-                                newPositions.add(new Position(newStart, newLength));
-                            }
-                        } else {
-                            System.out.println("in between");
-                            //word button in between, remove whole position, i.e. do nothing here
-                        }
-                    }
-                }
-                entity.setPositions(newPositions,data);
-            }
-            wordMap.remove("entities");
-            data.cleanUpEntities();
-        }
-        reloadViews();
-    }
-
-    public void removeEntity(int index) {
-        System.out.println("removeEntity");
-        data.removeEntity(index);
-        System.out.println("createAnnotations");
-        data.createAnnotations();
-        System.out.println("createWords");
-        data.createWords();
-        System.out.println("fillEntityButtonScrollView");
-        fillEntityButtonScrollView();
-        System.out.println("fillTypeButtonScrollView");
-        fillTypeButtonScrollView();
-        System.out.println("fillTextView");
-        fillTextView();
-        System.out.println("fillWordButtonView");
-        fillWordButtonView();
     }
 
     public void setEntityType(String type, int index) {
@@ -958,6 +301,7 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
             editNameDialogFragment.show(fm, "fragment_edit_name");
         } else {
             fillEntityButtonScrollView();
+            fillTextView(false);
         }
     }
 

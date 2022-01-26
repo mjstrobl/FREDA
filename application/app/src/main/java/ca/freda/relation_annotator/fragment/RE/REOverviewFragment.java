@@ -130,7 +130,7 @@ public class REOverviewFragment extends OverviewFragment implements View.OnClick
             nameButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.comHandler.setRelation(relation);
+                    activity.comHandler.setDataset(relation);
                     activity.setPagerItem(8);
                 }
             });

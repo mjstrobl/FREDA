@@ -12,6 +12,7 @@ import java.util.Set;
 public class Entity {
 
     private List<Position> positions;
+    private List<Position> textviewTextPositions;
     private String name;
     private EntityButtonProperty property;
     private int colour;
@@ -33,6 +34,11 @@ public class Entity {
         this.colour = colour;
         this.positions = positions;
         this.wikiName = wikiName;
+        if (wikiName == null) {
+            this.property = EntityButtonProperty.NONE;
+        } else {
+            this.property = EntityButtonProperty.WIKINAME;
+        }
     }
 
     public void increaseProperty() {
@@ -126,6 +132,10 @@ public class Entity {
         return property;
     }
 
+    public void setProperty(EntityButtonProperty property) {
+        this.property = property;
+    }
+
     public String getName() {
         return name;
     }
@@ -139,6 +149,12 @@ public class Entity {
     }
 
     public void setType(String type) {
+        if (type == null) {
+            this.property = EntityButtonProperty.NONE;
+        } else {
+            this.property = EntityButtonProperty.NERTYPE;
+        }
+
         this.type = type;
     }
 
@@ -147,6 +163,19 @@ public class Entity {
     }
 
     public void setWikiName(String wikiName) {
+        if (wikiName == null) {
+            this.property = EntityButtonProperty.NONE;
+        } else {
+            this.property = EntityButtonProperty.WIKINAME;
+        }
         this.wikiName = wikiName;
+    }
+
+    public List<Position> getTextviewTextPositions() {
+        return textviewTextPositions;
+    }
+
+    public void setTextviewTextPositions(List<Position> textviewTextPositions) {
+        this.textviewTextPositions = textviewTextPositions;
     }
 }

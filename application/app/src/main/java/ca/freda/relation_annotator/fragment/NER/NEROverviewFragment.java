@@ -128,7 +128,7 @@ public class NEROverviewFragment extends OverviewFragment implements View.OnClic
             nameButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.comHandler.setNerDataset(dataset);
+                    activity.comHandler.setDataset(dataset);
                     activity.setPagerItem(5);
                 }
             });

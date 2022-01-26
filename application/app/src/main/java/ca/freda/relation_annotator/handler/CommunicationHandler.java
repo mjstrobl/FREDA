@@ -34,10 +34,7 @@ public class CommunicationHandler {
     private JSONObject elAbstracts;
     private JSONObject elAliases;
 
-    private JSONObject relation;
-    private JSONObject crDataset;
-    private JSONObject nerDataset;
-    private JSONObject elDataset;
+    private JSONObject dataset;
 
     private int currentRow = 0;
 
@@ -55,8 +52,12 @@ public class CommunicationHandler {
         String downloads_directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
         File[] path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).listFiles();
 
-        this.elAbstracts = readFile(downloads_directory + "/abstracts_100000.json","storage");
-        this.elAliases = readFile(downloads_directory + "/aliases_100000.json","storage");
+        for (File f : path) {
+            System.out.println(f.getAbsolutePath());
+        }
+
+        this.elAbstracts = readFile("abstracts_100000.json","assets");
+        this.elAliases = readFile("aliases_100000.json","assets");
     }
 
     private JSONObject readFile(String filename, String type) {
@@ -115,8 +116,8 @@ public class CommunicationHandler {
                 startClient();
                 try {
                     message.put("uid", uid);
-                    if (relation != null) {
-                        message.put("relation", relation.getString("name"));
+                    if (dataset != null) {
+                        message.put("dataset", dataset.getString("name"));
                     }
                     clientHandler.sendMessage(message);
                 } catch (JSONException e) {
@@ -132,25 +133,19 @@ public class CommunicationHandler {
                     case 1:
                         if (task.equals("RE")) {
                             // REAnnotationFragment asks for data.
-                            message = this.reData.getJSONArray(relation.getString("name")).getJSONObject(currentRow);
-                            message.put("task","RE");
-                            mainActivity.receiveMessage(message);
+                            message = this.reData.getJSONArray(dataset.getString("name")).getJSONObject(currentRow);
                         } else if (task.equals("CR")) {
                             // CRAnnotationFragment asks for data.
-                            message = this.crData.getJSONArray(crDataset.getString("name")).getJSONObject(currentRow);
-                            message.put("task","CR");
-                            mainActivity.receiveMessage(message);
+                            message = this.crData.getJSONArray(dataset.getString("name")).getJSONObject(currentRow);
                         } else if (task.equals("NER")) {
                             // NERAnnotationFragment asks for data.
-                            message = this.nerData.getJSONArray(nerDataset.getString("name")).getJSONObject(currentRow);
-                            message.put("task","NER");
-                            mainActivity.receiveMessage(message);
+                            message = this.nerData.getJSONArray(dataset.getString("name")).getJSONObject(currentRow);
                         } else if (task.equals("EL")) {
                             // ELAnnotationFragment asks for data.
-                            message = this.nerData.getJSONArray(elDataset.getString("name")).getJSONObject(currentRow);
-                            message.put("task","EL");
-                            mainActivity.receiveMessage(message);
+                            message = this.nerData.getJSONArray(dataset.getString("name")).getJSONObject(currentRow);
                         }
+                        message.put("task",task);
+                        mainActivity.receiveMessage(message);
                         currentRow++;
                         if (currentRow >= 1000) {
                             currentRow = 0;
@@ -233,41 +228,17 @@ public class CommunicationHandler {
         }
     }
 
-    public JSONObject getRelation() {
-        return relation;
+    public JSONObject getDataset() {
+        return dataset;
     }
 
-    public void setRelation(JSONObject relation) {
+    public void setDataset(JSONObject dataset) {
         this.currentRow = 0;
-        this.relation = relation;
+        this.dataset = dataset;
     }
 
     public void setOnline(boolean online) {
         this.online = online;
-    }
-
-    public JSONObject getCrDataset() {
-        return crDataset;
-    }
-
-    public void setCrDataset(JSONObject crDataset) {
-        this.crDataset = crDataset;
-    }
-
-    public JSONObject getNerDataset() {
-        return nerDataset;
-    }
-
-    public void setNerDataset(JSONObject nerDataset) {
-        this.nerDataset = nerDataset;
-    }
-
-    public JSONObject getElDataset() {
-        return elDataset;
-    }
-
-    public void setElDataset(JSONObject elDataset) {
-        this.elDataset = elDataset;
     }
 
     public JSONObject getElAbstracts() {

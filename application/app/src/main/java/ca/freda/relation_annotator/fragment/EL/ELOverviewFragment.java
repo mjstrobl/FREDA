@@ -129,7 +129,7 @@ public class ELOverviewFragment extends OverviewFragment implements View.OnClick
             nameButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.comHandler.setElDataset(dataset);
+                    activity.comHandler.setDataset(dataset);
                     activity.setPagerItem(7);
                 }
             });

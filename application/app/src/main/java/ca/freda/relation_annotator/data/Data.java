@@ -10,7 +10,7 @@ public class Data {
     private String sentence;
     private List<Entity> entities;
     private List<Map<String,Object>> words;
-    private Map<Integer,List<Entity>> entityAnnotations;
+    private Map<Integer,Entity> entityAnnotations;
 
     public Data(String sentence) {
         this.entities = new ArrayList<>();
@@ -69,10 +69,7 @@ public class Data {
                 int start = position.start;
                 int length = position.length;
                 for (int j = start; j < start+length; j++) {
-                    if (!entityAnnotations.containsKey(j)) {
-                        entityAnnotations.put(j,new ArrayList<Entity>());
-                    }
-                    entityAnnotations.get(j).add(entity);
+                    entityAnnotations.put(j,entity);
                 }
             }
         }
@@ -123,7 +120,7 @@ public class Data {
         wordMap.put("word", word);
         wordMap.put("start", start);
         wordMap.put("length", word.length());
-        wordMap.put("entities",entityAnnotations.get(start));
+        wordMap.put("entity",entityAnnotations.get(start));
 
         words.add(wordMap);
     }

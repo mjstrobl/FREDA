@@ -18,7 +18,7 @@ public class EntityButtonOnClickListener implements View.OnClickListener {
     public void onClick(View v) {
         int tag = (int)v.getTag();
         Button button = (Button) v;
-        annotationFragment.entityButtonClicked(tag,button);
+        annotationFragment.entityButtonClicked(tag,button, null);
 
     }
 }

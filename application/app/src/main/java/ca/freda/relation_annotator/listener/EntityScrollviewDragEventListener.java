@@ -61,7 +61,7 @@ public class EntityScrollviewDragEventListener implements View.OnDragListener {
                     annotationFragment.addEntity(index, null);
                 }
 
-                annotationFragment.reloadViews();
+                annotationFragment.reloadViews(true);
 
                 v.invalidate();
                 return true;

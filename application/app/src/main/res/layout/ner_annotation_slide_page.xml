@@ -49,12 +49,12 @@
                             android:layout_height="match_parent"
                             android:singleLine="true"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/relation_textview"
+                            app:layout_constraintEnd_toStartOf="@+id/dataset_textview"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
-                            android:id="@+id/relation_textview"
+                            android:id="@+id/dataset_textview"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
                             android:textAlignment="center"
