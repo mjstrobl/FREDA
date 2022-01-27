@@ -45,7 +45,7 @@ public class Data {
 
     }
 
-    public void addEntity(int colour, EntityButtonProperty property, List<Position> positions) {
+    public Entity addEntity(int colour, EntityButtonProperty property, List<Position> positions) {
         Entity entity = new Entity(colour,property,positions);
         entity.findName(this);
         entities.add(entity);
@@ -56,9 +56,18 @@ public class Data {
                 return Integer.compare(o1.getPositions().get(0).start,o2.getPositions().get(0).start);
             }
         });
-
+        return entity;
     }
 
+    public int findIndexForEntity(Entity entity) {
+        System.out.println("WE have no. entities: " + entities.size());
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i) == entity) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     public void createAnnotations() {
         entityAnnotations = new HashMap<>();

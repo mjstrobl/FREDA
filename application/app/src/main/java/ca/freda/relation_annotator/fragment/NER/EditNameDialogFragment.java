@@ -32,11 +32,12 @@ public class EditNameDialogFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static EditNameDialogFragment newInstance(ArrayList<String> types, int index) {
+    public static EditNameDialogFragment newInstance(ArrayList<String> types, int index, boolean reset) {
         EditNameDialogFragment frag = new EditNameDialogFragment();
         Bundle args = new Bundle();
         args.putStringArrayList("subtypes",types);
         args.putInt("index",index);
+        args.putBoolean("reset",reset);
         frag.setArguments(args);
         return frag;
     }
@@ -53,7 +54,7 @@ public class EditNameDialogFragment extends DialogFragment {
 
         ArrayList<String> types = getArguments().getStringArrayList("subtypes");
         int index = getArguments().getInt("index");
-
+        boolean reset = getArguments().getBoolean("reset");
 
         LinearLayout layout = new LinearLayout(getActivity());
 
@@ -74,11 +75,14 @@ public class EditNameDialogFragment extends DialogFragment {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String type = (String)v.getTag();
+                    //String type = (String)v.getTag();
                     NERAnnotationFragment nerAnnotationFragment = (NERAnnotationFragment) getTargetFragment();
                     nerAnnotationFragment.getData().getEntity(index).setType(type);
                     nerAnnotationFragment.fillEntityButtonScrollView();
-                    nerAnnotationFragment.fillTextView(false);
+                    nerAnnotationFragment.fillTextView(reset);
+                    if (reset) {
+                        nerAnnotationFragment.fillWordButtonView();
+                    }
                     getDialog().dismiss();
                 }
             });

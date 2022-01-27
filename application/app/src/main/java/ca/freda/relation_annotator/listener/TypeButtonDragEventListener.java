@@ -45,7 +45,7 @@ public class TypeButtonDragEventListener implements View.OnDragListener {
             case DragEvent.ACTION_DRAG_ENTERED: {
                 System.out.println("ACTION_DRAG_ENTERED");
                 String text = (String) event.getClipDescription().getLabel();
-                if (text.contains("entity")) {
+                if (text.contains("entity") || text.contains("word")) {
                     //v.setBackgroundColor(Color.GREEN);
                     v.getBackground().setColorFilter(Color.GREEN,PorterDuff.Mode.MULTIPLY);
                 }
@@ -72,9 +72,13 @@ public class TypeButtonDragEventListener implements View.OnDragListener {
                 String[] tokens = text.split("_");
                 System.out.println("Item text: " + text);
                 int buttonId = Integer.parseInt(tokens[tokens.length - 1]);
+                String type = (String) v.getTag();
                 if (text.contains("entity")) {
                     System.out.println("entity button id: " + buttonId);
-                    annotationFragment.setEntityType((String) v.getTag(), buttonId);
+                    annotationFragment.setEntityType(type, buttonId);
+                } else if (text.contains("word")) {
+                    System.out.println("entity button id: " + buttonId);
+                    annotationFragment.addEntityToType(type, buttonId);
                 }
 
                 return true;

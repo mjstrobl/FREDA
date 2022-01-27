@@ -196,7 +196,4 @@ public class CRAnnotationFragment extends AnnotationFragment implements View.OnC
         button.setOnTouchListener(new EntityButtonOnTouchListener(this));
         button.setOnDragListener(new WordButtonDragEventListener(this,data.getEntity((int)button.getTag())));
     }
-
-
-
 }

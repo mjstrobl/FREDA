@@ -225,7 +225,6 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
             }
 
             List<String> types = new ArrayList<>();
-
             if (activity.comHandler.getDataset().get("system").equals("flat")) {
                 JSONArray typesJSON = activity.comHandler.getDataset().getJSONArray("types");
                 for (int i = 0; i < typesJSON.length(); i++) {
@@ -293,10 +292,10 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
         System.out.println("set type: " + type + ", for entity idx: " + index);
         data.getEntity(index).setType(type);
 
-        if (typeHierarchy != null) {
+        if (typeHierarchy != null && typeHierarchy.containsKey(type)) {
             System.out.println("Found type hierarchy.");
             FragmentManager fm = getActivity().getSupportFragmentManager();
-            EditNameDialogFragment editNameDialogFragment = EditNameDialogFragment.newInstance(typeHierarchy.get(type), index);
+            EditNameDialogFragment editNameDialogFragment = EditNameDialogFragment.newInstance(typeHierarchy.get(type), index, false);
             editNameDialogFragment.setTargetFragment(this, 0);
             editNameDialogFragment.show(fm, "fragment_edit_name");
         } else {
@@ -305,7 +304,42 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
         }
     }
 
-    public Data getData() {
-        return data;
+    public void addEntityToType(String type, int wordViewId) {
+        // check if position is already part of entity
+        Map<String, Object> wordMap = data.getWords().get(wordViewId);
+        int start = (Integer) wordMap.get("start");
+        int length = (Integer) wordMap.get("length");
+        String word = (String) wordMap.get("word");
+        Entity wordEntity = (Entity) wordMap.get("entity");
+
+        if (wordEntity != null) {
+            System.out.println("Found entity in word.");
+            wordEntity.setType(type);
+        } else if (!type.equals("NO TYPE")){
+            System.out.println("create new entity: " + word);
+            int colour = getNewEntityColour();
+            List<Position> positions = new ArrayList<>();
+            positions.add(new Position(start, length));
+            wordEntity = data.addEntity(colour,EntityButtonProperty.NONE, positions);
+            wordEntity.setType(type);
+            data.getWords().get(wordViewId).put("entity",wordEntity);
+            usedColours.add(colour);
+        }
+        if (typeHierarchy != null && typeHierarchy.containsKey(type)) {
+            int index = data.findIndexForEntity(wordEntity);
+            System.out.println("entity index found: " + index);
+            if (index == -1) {
+                activity.showToast("Cannot find index of new entity, something went wrong!");
+            } else {
+                System.out.println("Found type hierarchy.");
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                EditNameDialogFragment editNameDialogFragment = EditNameDialogFragment.newInstance(typeHierarchy.get(type), index, true);
+                editNameDialogFragment.setTargetFragment(this, 0);
+                editNameDialogFragment.show(fm, "fragment_edit_name");
+            }
+        } else {
+            fillEntityButtonScrollView();
+            fillTextView(false);
+        }
     }
 }

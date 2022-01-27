@@ -365,7 +365,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
         textView.setText(Html.fromHtml(sentence,0));
     }
 
-    private void fillWordButtonView() {
+    public void fillWordButtonView() {
         ScrollView scrollView = (ScrollView) rootView.findViewById(R.id.word_scrollview);
         scrollView.removeAllViews();
 
@@ -465,7 +465,11 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
 
         for (int i = 0; i < data.getNumEntities(); i++) {
             Entity entity = data.getEntity(i);
-            System.out.println(entity.toString());
+            System.out.println(entity.getName());
+            System.out.println("Positions:");
+            for (Position p : entity.getPositions()) {
+                System.out.println("(" + p.start + ", " + p.length + ")");
+            }
             Button button = new Button(getActivity());
             button.setActivated(false);
             button.setTypeface(null, Typeface.NORMAL);
@@ -672,5 +676,9 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
         //data.createWords();
 
         reloadViews(false);
+    }
+
+    public Data getData() {
+        return data;
     }
 }

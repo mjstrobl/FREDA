@@ -149,7 +149,7 @@ public class Entity {
     }
 
     public void setType(String type) {
-        if (type == null) {
+        if (type == null || type.equals("NO TYPE")) {
             this.property = EntityButtonProperty.NONE;
         } else {
             this.property = EntityButtonProperty.NERTYPE;
