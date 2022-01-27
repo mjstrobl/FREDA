@@ -20,7 +20,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/cr_uid_textview"
+            android:id="@+id/device_uid_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:editable="false" />
@@ -32,7 +32,7 @@
             android:text="Main menu" />
 
         <Button
-            android:id="@+id/cr_get_button"
+            android:id="@+id/dataset_get_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Get Datasets" />
@@ -43,7 +43,7 @@
             android:orientation="vertical">
 
             <ScrollView
-                android:id="@+id/relations_scrollview"
+                android:id="@+id/dataset_scrollview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:ignore="SpeakableTextPresentCheck" />

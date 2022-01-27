@@ -122,13 +122,13 @@ public class MainActivity extends AppCompatActivity {
             }
             case 5: {
                 if (task.equals("RE")) {
-                    pagerAdapter.reOverviewFragment.showRelations(message.getJSONArray("relations"));
+                    pagerAdapter.reOverviewFragment.showDatasets(message.getJSONArray("relations"));
                 } else if (task.equals("CR")) {
-                    pagerAdapter.crOverviewFragment.showTypes(message.getJSONArray("datasets"));
+                    pagerAdapter.crOverviewFragment.showDatasets(message.getJSONArray("datasets"));
                 } else if (task.equals("NER")) {
-                    pagerAdapter.nerOverviewFragment.showTypes(message.getJSONArray("datasets"));
+                    pagerAdapter.nerOverviewFragment.showDatasets(message.getJSONArray("datasets"));
                 } else if (task.equals("EL")) {
-                    pagerAdapter.elOverviewFragment.showTypes(message.getJSONArray("datasets"));
+                    pagerAdapter.elOverviewFragment.showDatasets(message.getJSONArray("datasets"));
                 }
                 break;
             }

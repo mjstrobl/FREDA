@@ -1,6 +1,7 @@
 package ca.freda.relation_annotator.fragment.EL;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -37,8 +38,6 @@ import ca.freda.relation_annotator.fragment.NER.NERAnnotationFragment;
 
 public class CandidateSelectionDialog extends DialogFragment {
 
-    private EditText mEditText;
-
     public CandidateSelectionDialog() {
         // Empty constructor is required for DialogFragment
         // Make sure not to add arguments to the constructor
@@ -57,47 +56,32 @@ public class CandidateSelectionDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
-        Point size = new Point();
-        display.getRealSize(size);
-        display.getSize(size);
-        int width = size.x;
-        int height = size.y;
+        return inflater.inflate(R.layout.entity_linking_page, container);
+    }
+    private Point getDisplaySize() {
+        Window window = getDialog().getWindow();
+        Point displaySize = new Point();
 
-        ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
-        params.width = width - 30;
-        params.height = height - 30;
+        Display display = window.getWindowManager().getDefaultDisplay();
+        display.getSize(displaySize);
 
-
-        System.out.println("width: " + width);
-        System.out.println("height: " + height);
-
-        getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
-
-
-        return inflater.inflate(R.layout.fragment_edit_name, container);
+        return displaySize;
     }
 
     public void onResume() {
         super.onResume();
 
         Window window = getDialog().getWindow();
-        Point size = new Point();
+        Point displaySize = getDisplaySize();
 
-        Display display = window.getWindowManager().getDefaultDisplay();
-        display.getSize(size);
-
-        int width = size.x;
-        int height = size.y;
+        int width = displaySize.x;
+        int height = displaySize.y;
 
         ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
         params.width = (int)(width * 0.9);
         params.height = (int)(height * 0.9);
 
-        //window.setLayout((int) (width * 0.90),(int) (height * 0.90), WindowManager.LayoutParams.WRAP_CONTENT);
         getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
         window.setGravity(Gravity.CENTER);
     }
@@ -105,6 +89,15 @@ public class CandidateSelectionDialog extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Point displaySize = getDisplaySize();
+
+        Button closeButton = view.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDialog().dismiss();
+            }
+        });
 
         try {
             JSONObject candidates = new JSONObject(getArguments().getString("candidates"));
@@ -114,7 +107,7 @@ public class CandidateSelectionDialog extends DialogFragment {
 
             LinearLayout layout = new LinearLayout(getActivity());
 
-            ScrollView scrollView = view.findViewById(R.id.subtype_scrollview);
+            ScrollView scrollView = view.findViewById(R.id.entity_linking_scrollview);
             scrollView.removeAllViews();
 
             layout.setOrientation(LinearLayout.VERTICAL);
@@ -124,8 +117,23 @@ public class CandidateSelectionDialog extends DialogFragment {
             TableLayout tableLayout = new TableLayout(getActivity());
             tableLayout.setOrientation(LinearLayout.VERTICAL);
             System.out.println("table layout: " + tableLayout);
-            tableLayout.setShrinkAllColumns(true);
-            tableLayout.setStretchAllColumns(true);
+            //tableLayout.setShrinkAllColumns(true);
+            //tableLayout.setStretchAllColumns(true);
+
+            TableRow tableRow = new TableRow(getActivity());
+            tableRow.setBackgroundColor(Color.LTGRAY);
+            TextView textView1 = new TextView(getActivity());
+            textView1.setText("Entity");
+            textView1.setTextSize(22);
+
+            TextView textView2 = new TextView(getActivity());
+            textView2.setText("Abstract");
+            textView2.setTextSize(22);
+
+
+            tableRow.addView(textView1);
+            tableRow.addView(textView2);
+            tableLayout.addView(tableRow);
 
             while(keys.hasNext()) {
                 String candidate = keys.next();
@@ -139,11 +147,12 @@ public class CandidateSelectionDialog extends DialogFragment {
                 button.setTypeface(null, Typeface.NORMAL);
                 button.setTag(candidate);
                 button.setText(candidate);
+                button.setWidth((int)Math.round(displaySize.x*0.25*0.9));
+                button.setTypeface(null, Typeface.BOLD);
 
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String type = (String)v.getTag();
                         ELAnnotationFragment elAnnotationFragment = (ELAnnotationFragment) getTargetFragment();
                         if (candidate.equals("NO ENTITY")) {
                             elAnnotationFragment.getData().getEntity(index).setWikiName(null);
@@ -159,7 +168,8 @@ public class CandidateSelectionDialog extends DialogFragment {
 
                 TextView textViewRows = new TextView(getActivity());
                 textViewRows.setText(candidtateAbstract);
-                TableRow tableRow = new TableRow(getActivity());
+                textViewRows.setWidth((int)Math.round(displaySize.x*0.65*0.9));
+                tableRow = new TableRow(getActivity());
                 tableRow.addView(button);
                 tableRow.addView(textViewRows);
                 tableLayout.addView(tableRow);

@@ -192,15 +192,29 @@ public class CommunicationHandler {
                             // annotator asks for candidates
                             String mention = message.getString("mention");
                             JSONObject candidates = new JSONObject();
-                            candidates.put("NO ENTITY","");
+                            if (message.has("wikiName")) {
+                                candidates.put(message.getString("wikiName"),"<no abstract available>");
+                            }
                             if (elAliases.has(mention)) {
                                 JSONArray entities = elAliases.getJSONArray(mention);
                                 for (int i = 0; i < entities.length(); i++) {
                                     String candidate = entities.getString(i);
                                     if (elAbstracts.has(candidate)) {
+                                        System.out.println(elAbstracts.getString(candidate));
                                         candidates.put(candidate,elAbstracts.getString(candidate));
                                     }
                                 }
+
+                                candidates.put("1","asfdsfdsfds");
+                                candidates.put("2","asfdsfdsfds");
+                                candidates.put("3","asfdsfdsfds");
+                                candidates.put("4","asfdsfdsfds");
+                                candidates.put("5","asfdsfdsfds");
+                                candidates.put("6","asfdsfdsfds");
+                                candidates.put("7","asfdsfdsfds");
+                                candidates.put("8","v");
+                                candidates.put("9","asfdsfdsfds");
+                                candidates.put("10","asfdsfdsfds");
                             }
                             message.put("candidates",candidates);
                             mainActivity.receiveMessage(message);

@@ -178,6 +178,9 @@ public class ELAnnotationFragment extends AnnotationFragment implements View.OnC
                     message.put("task", "EL");
                     message.put("index",button.getTag());
                     message.put("mention",entity.getName());
+                    if (entity.getWikiName() != null) {
+                        message.put("wikiName",entity.getWikiName());
+                    }
                     activity.comHandler.sendMessage(message);
                 } catch (JSONException ex) {
                     ex.printStackTrace();
