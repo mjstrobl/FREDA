@@ -124,7 +124,7 @@ public class ELAnnotationFragment extends AnnotationFragment implements View.OnC
             String sentence = currentServerMessage.getString("sentence");
 
             data = new Data(sentence);
-            JSONArray annotations = currentServerMessage.getJSONArray("entities");
+            JSONArray annotations = currentServerMessage.getJSONObject("entities").getJSONArray("entities");
 
             int annotator = currentServerMessage.getInt("annotator");
             TextView relationTextView = rootView.findViewById(R.id.el_textview);

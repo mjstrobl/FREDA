@@ -153,7 +153,7 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
             String sentence = currentServerMessage.getString("sentence");
 
             data = new Data(sentence);
-            JSONArray annotations = currentServerMessage.getJSONArray("entities");
+            JSONArray annotations = currentServerMessage.getJSONObject("entities").getJSONArray("entities");
 
 
             if (currentDatasetName.contains("noentities")) {

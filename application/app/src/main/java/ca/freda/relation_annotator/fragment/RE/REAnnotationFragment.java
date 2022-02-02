@@ -74,7 +74,12 @@ public class REAnnotationFragment extends AnnotationFragment {
         }
         sampleObject.put("subjects",subjects);
         sampleObject.put("objects",objects);
-        sampleObject.put("entities",entities);
+
+        JSONObject entityAnnotations = new JSONObject();
+        entityAnnotations.put("entities",entities);
+        entityAnnotations.put("task",task);
+
+        sampleObject.put("entities",entityAnnotations);
     }
 
     public void createData(JSONObject message) {
@@ -88,28 +93,16 @@ public class REAnnotationFragment extends AnnotationFragment {
             String sentence = currentServerMessage.getString("sentence");
 
             data = new Data(sentence);
-            JSONArray annotations = currentServerMessage.getJSONArray("entities");
-            JSONArray subjectsJson = currentServerMessage.getJSONArray("subjects");
-            JSONArray objectsJson = currentServerMessage.getJSONArray("objects");
+            JSONArray annotations = currentServerMessage.getJSONObject("entities").getJSONArray("entities");
 
             int annotator = currentServerMessage.getInt("annotator");
             setDatasetTextviewText(annotator);
-
-            Set<Integer> subjects = (Set<Integer>) Utils.jsonArrayToSet(subjectsJson);
-            Set<Integer> objects = (Set<Integer>)Utils.jsonArrayToSet(objectsJson);
 
             for(int i = 0; i < annotations.length(); i++) {
                 JSONObject annotation = annotations.getJSONObject(i);
 
                 JSONArray positionsJSON = annotation.getJSONArray("positions");
                 EntityButtonProperty property = EntityButtonProperty.NONE;
-                if (subjects.contains(i)) {
-                    System.out.println("subject");
-                    property = EntityButtonProperty.SUBJECT;
-                } else if (objects.contains(i)) {
-                    System.out.println("subject");
-                    property = EntityButtonProperty.OBJECT;
-                }
 
                 List<Position> positions = new ArrayList<>(positionsJSON.length());
                 for (int j = 0; j < positionsJSON.length(); j++) {
