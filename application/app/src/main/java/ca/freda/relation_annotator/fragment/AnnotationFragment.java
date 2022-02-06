@@ -58,6 +58,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
 
     protected String currentDatasetInfo;
     protected String currentDatasetName;
+    protected String currentDatasetSource;
     protected MainActivity activity;
 
     protected String task;
@@ -88,6 +89,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 } else {
                     currentDatasetInfo = currentDatasetName;
                 }
+                currentDatasetSource = activity.comHandler.getDataset().getString("dataset");
 
                 uidTextView.setText(activity.getUID());
 
@@ -134,6 +136,8 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 JSONObject message = new JSONObject();
                 message.put("task", task);
                 message.put("mode", 1);
+                message.put("datasetName", currentDatasetName);
+                message.put("datasetSource",currentDatasetSource);
                 activity.comHandler.sendMessage(message);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -185,6 +189,8 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                     JSONObject message = new JSONObject();
                     message.put("task", task);
                     message.put("mode", 4);
+                    message.put("datasetName", currentDatasetName);
+                    message.put("datasetSource",currentDatasetSource);
                     activity.comHandler.sendMessage(message);
                     message.put("mode", 1);
                     activity.comHandler.sendMessage(message);
@@ -198,6 +204,8 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                     try {
                         JSONObject message = new JSONObject();
                         message.put("task", task);
+                        message.put("datasetName", currentDatasetName);
+                        message.put("datasetSource",currentDatasetSource);
                         message.put("mode", 1);
                         activity.comHandler.sendMessage(message);
                     } catch (JSONException e) {
@@ -242,8 +250,10 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             if (msg != null) {
                 JSONObject sampleObject = new JSONObject();
                 sampleObject.put("mode", 2);
+                sampleObject.put("task", task);
                 sampleObject.put("response", response);
-                sampleObject.put("dataset", currentDatasetName);
+                sampleObject.put("datasetName", currentDatasetName);
+                sampleObject.put("datasetSource",currentDatasetSource);
                 sampleObject.put("uid", activity.getUID());
                 sampleObject.put("article", currentServerMessage.getString("article"));
                 sampleObject.put("line", currentServerMessage.getInt("line"));
@@ -252,10 +262,12 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 System.out.println(msg.obj);
                 activity.comHandler.sendMessage(msg);
             }
-
+            System.out.println("Ask for new sample.");
             JSONObject message = new JSONObject();
             message.put("task", task);
             message.put("mode", 1);
+            message.put("datasetName", currentDatasetName);
+            message.put("datasetSource",currentDatasetSource);
             activity.comHandler.sendMessage(message);
         } catch (JSONException ex) {
             ex.printStackTrace();

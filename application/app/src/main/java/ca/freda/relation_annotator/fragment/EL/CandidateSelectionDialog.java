@@ -24,6 +24,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,7 +45,7 @@ public class CandidateSelectionDialog extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static CandidateSelectionDialog newInstance(JSONObject candidates, int index) {
+    public static CandidateSelectionDialog newInstance(JSONArray candidates, int index) {
         CandidateSelectionDialog frag = new CandidateSelectionDialog();
         Bundle args = new Bundle();
         args.putString("candidates",candidates.toString());
@@ -100,7 +101,7 @@ public class CandidateSelectionDialog extends DialogFragment {
         });
 
         try {
-            JSONObject candidates = new JSONObject(getArguments().getString("candidates"));
+            JSONArray candidates = new JSONArray(getArguments().getString("candidates"));
 
             int index = getArguments().getInt("index");
 
@@ -111,8 +112,6 @@ public class CandidateSelectionDialog extends DialogFragment {
             scrollView.removeAllViews();
 
             layout.setOrientation(LinearLayout.VERTICAL);
-
-            Iterator<String> keys = candidates.keys();
 
             TableLayout tableLayout = new TableLayout(getActivity());
             tableLayout.setOrientation(LinearLayout.VERTICAL);
@@ -134,13 +133,9 @@ public class CandidateSelectionDialog extends DialogFragment {
             tableRow.addView(textView1);
             tableRow.addView(textView2);
             tableLayout.addView(tableRow);
-
-            while(keys.hasNext()) {
-                String candidate = keys.next();
-                String candidtateAbstract = candidates.getString(candidate);
-
-
-
+            for (int i = 0; i < candidates.length(); i++) {
+                String candidate = ((JSONArray)candidates.get(i)).getString(0);
+                String candidtateAbstract = ((JSONArray)candidates.get(i)).getString(1);
 
                 Button button = new Button(getActivity());
                 button.setActivated(false);

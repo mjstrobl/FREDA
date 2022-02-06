@@ -113,12 +113,11 @@ public class CommunicationHandler {
     public void sendMessage(JSONObject message) {
         try {
             if (online) {
-                startClient();
+                if (clientHandler == null) {
+                    startClient();
+                }
                 try {
                     message.put("uid", uid);
-                    if (dataset != null) {
-                        message.put("dataset", dataset.getString("name"));
-                    }
                     clientHandler.sendMessage(message);
                 } catch (JSONException e) {
                     e.printStackTrace();

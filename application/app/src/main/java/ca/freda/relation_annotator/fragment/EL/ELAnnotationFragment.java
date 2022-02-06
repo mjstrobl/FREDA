@@ -191,7 +191,7 @@ public class ELAnnotationFragment extends AnnotationFragment implements View.OnC
         button.setOnLongClickListener(new EntityViewLongClickListener());
     }
 
-    public void showCandidates(JSONObject candidates, int index) {
+    public void showCandidates(JSONArray candidates, int index) {
         if (candidates.length() == 0) {
             activity.showToast("No candidates available for this mention!");
         } else {

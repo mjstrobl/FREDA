@@ -1,39 +1,44 @@
 import json
 
 class OverviewManager:
-
     def get_datasets(self, conn, uid, task):
         c = conn.cursor()
-        c.execute("SELECT * FROM dataset WHERE status = 1 AND task = ?;",(task,))
+        if task == "RE":
+            c.execute("SELECT name, dataset, info_short, data, status FROM dataset_RE;")
+        elif task == "EL":
+            c.execute("SELECT name, dataset, info_short, data, status FROM dataset_EL;")
+        elif task == "CR":
+            c.execute("SELECT name, dataset, info_short, data, status FROM dataset_CR;")
+        elif task == "NER":
+            c.execute("SELECT name, dataset, info_short, data, status FROM dataset_NER;")
 
         datasets = []
         for row in c:
-            name = row[0]
-            info_short = row[4]
-            datasets.append({"name": name, "info_short": info_short})
+            dataset_name = row[0]
+            dataset_source = row[1]
+            info_short = row[2]
+            dataset = json.loads(row[3])
+            status = row[4]
 
-        print("found datasets")
-        print(datasets)
+            if status == 0:
+                continue
 
-        for dataset in datasets:
-            dataset_name = dataset['name']
+            #dataset = {"name": dataset_name, "info_short": info_short, "dataset": dataset_source, ""}
+            dataset['name'] = dataset_name
+            dataset['info_short'] = info_short
+            dataset['dataset'] = dataset_source
+
             cur = conn.cursor()
 
-            sql_annotator_1 = "SELECT COUNT(*) FROM sentence s, " + dataset_name + " r WHERE s.response > -2 AND s.article = r.article AND s.line = r.line AND r.annotator_1 = ? AND r.response_1 > -1 " \
-                                                                                    "AND (response_2 IS NULL OR response_2 > -1) AND (response_3 IS NULL OR response_3 > -1);"
-            sql_annotator_2 = "SELECT COUNT(*) FROM sentence s, " + dataset_name + " r WHERE s.response > -2 AND s.article = r.article AND s.line = r.line AND r.annotator_2 = ? AND r.response_2 > -1 " \
-                                                                                    "AND (response_1 IS NULL OR response_1 > -1) AND (response_3 IS NULL OR response_3 > -1);"
-            sql_annotator_3 = "SELECT COUNT(*) FROM sentence s, " + dataset_name + " r WHERE s.response > -2 AND s.article = r.article AND s.line = r.line AND r.annotator_3 = ? AND r.response_3 > -1 " \
-                                                                                    "AND (response_1 IS NULL OR response_1 > -1) AND (response_2 IS NULL OR response_2 > -1);"
+            sql_annotator_1 = "SELECT COUNT(*) FROM " + dataset_name + " WHERE annotator_1 = ? AND response_1 > -1 AND (response_2 IS NULL OR response_2 > -1) AND (response_3 IS NULL OR response_3 > -1);"
+            sql_annotator_2 = "SELECT COUNT(*) FROM " + dataset_name + " WHERE annotator_2 = ? AND response_2 > -1 AND (response_1 IS NULL OR response_1 > -1) AND (response_3 IS NULL OR response_3 > -1);"
+            sql_annotator_3 = "SELECT COUNT(*) FROM " + dataset_name + " WHERE annotator_3 = ? AND response_3 > -1 AND (response_1 IS NULL OR response_1 > -1) AND (response_2 IS NULL OR response_2 > -1);"
 
-            sql_annotator_once = "SELECT COUNT(*) FROM sentence s, " + dataset_name + " r WHERE s.response > -2 AND s.article = r.article AND s.line = r.line " \
-                                                                                       "AND r.annotator_1 IS NOT NULL AND response_1 > -1;"
+            sql_annotator_once  = "SELECT COUNT(*) FROM " + dataset_name + " WHERE annotator_1 IS NOT NULL AND response_1 > -1;"
 
-            sql_annotator_twice = "SELECT COUNT(*) FROM sentence s, " + dataset_name + " r WHERE s.response > -2 AND s.article = r.article AND s.line = r.line " \
-                                                                                        "AND r.annotator_1 IS NOT NULL AND response_1 > -1 AND annotator_2 IS NOT NULL AND response_2 > -1;"
+            sql_annotator_twice = "SELECT COUNT(*) FROM " + dataset_name + " WHERE annotator_1 IS NOT NULL AND response_1 > -1 AND annotator_2 IS NOT NULL AND response_2 > -1;"
 
-            sql_annotator_full = "SELECT COUNT(*) FROM sentence s, " + dataset_name + " r WHERE s.response > -2 AND s.article = r.article AND s.line = r.line " \
-                                                                                       "AND r.annotator_1 IS NOT NULL AND response_1 > -1 AND annotator_2 IS NOT NULL AND response_2 > -1 AND (response_1 = response_2 OR (annotator_3 IS NOT NULL AND response_3 > -1));"
+            sql_annotator_full  = "SELECT COUNT(*) FROM " + dataset_name + " WHERE annotator_1 IS NOT NULL AND response_1 > -1 AND annotator_2 IS NOT NULL AND response_2 > -1 AND (response_1 = response_2 OR (annotator_3 IS NOT NULL AND response_3 > -1));"
 
             cur.execute(sql_annotator_1, (uid,))
             dataset['annotations_1'] = cur.fetchall()[0][0]
@@ -53,10 +58,12 @@ class OverviewManager:
             cur.execute(sql_annotator_full)
             dataset['full'] = cur.fetchall()[0][0]
 
+            datasets.append(dataset)
+
             print("found info for dataset: " + dataset_name)
             print(dataset)
 
-        message = {"mode": 5, "datasets": datasets}
+        message = {"mode": 5, "datasets": datasets, "task": task}
 
         print(message)
 

@@ -120,7 +120,9 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
 
         for (int i = 0; i < datasets.length(); i++) {
             final JSONObject dataset = datasets.getJSONObject(i);
-            final String relationName = dataset.getString("name");
+            final String datasetName = dataset.getString("name");
+            final String info = dataset.getString("info_short");
+            final String datasetSource = dataset.getString("dataset");
             int annotations_1 = dataset.getInt("annotations_1");
             int annotations_2 = dataset.getInt("annotations_2");
             int annotations_3 = dataset.getInt("annotations_3");
@@ -130,8 +132,8 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
             System.out.println(dataset);
 
             Button nameButton = new Button(activity);
-            nameButton.setText(relationName);
-            nameButton.setTag(relationName);
+            nameButton.setText(datasetName);
+            nameButton.setTag(datasetName);
             nameButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

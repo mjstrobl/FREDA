@@ -26,12 +26,13 @@ public class ClientHandler extends Handler {
     private MainActivity mainActivity;
 
     private static final int SERVERPORT = 4444;
-    private static final String SERVERIP = "199.116.235.147";
-    //private static final String SERVERIP = "192.168.178.23";
+    //private static final String SERVERIP = "199.116.235.147";
+    private static final String SERVERIP = "192.168.178.25";
 
     public ClientHandler(Looper myLooper, MainActivity mainActivity) {
         super(myLooper);
         this.mainActivity = mainActivity;
+        System.out.println("Create new ClientHandler.");
     }
 
     public void handleMessage(Message msg) {
@@ -57,6 +58,7 @@ public class ClientHandler extends Handler {
 
     private void establishConnection() {
         System.out.println("try to establish connection");
+        System.out.println(socket);
         if (socket == null || !socket.isConnected()) {
             boolean result = connect();
             if (result) {

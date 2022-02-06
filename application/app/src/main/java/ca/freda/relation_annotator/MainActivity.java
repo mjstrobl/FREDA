@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             }
             case 5: {
                 if (task.equals("RE")) {
-                    pagerAdapter.reOverviewFragment.showDatasets(message.getJSONArray("relations"));
+                    pagerAdapter.reOverviewFragment.showDatasets(message.getJSONArray("datasets"));
                 } else if (task.equals("CR")) {
                     pagerAdapter.crOverviewFragment.showDatasets(message.getJSONArray("datasets"));
                 } else if (task.equals("NER")) {
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
             }
             case 6: {
                 if (task.equals("EL")) {
-                    pagerAdapter.elAnnotationFragment.showCandidates(message.getJSONObject("candidates"), message.getInt("index"));
+                    pagerAdapter.elAnnotationFragment.showCandidates(message.getJSONArray("candidates"), message.getInt("index"));
                 }
                 break;
             }
