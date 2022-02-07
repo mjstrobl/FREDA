@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
             }
             case 6: {
                 if (task.equals("EL")) {
+                    System.out.println(message);
                     pagerAdapter.elAnnotationFragment.showCandidates(message.getJSONArray("candidates"), message.getInt("index"));
                 }
                 break;

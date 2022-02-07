@@ -4,8 +4,8 @@ import sqlite3
 from json.decoder import JSONDecodeError
 from sqlite3 import Error
 
-database_filename = '/media/michi/Data/datasets/freda/main.db'
-coref_data_filename = '/application/app/src/main/assets/ner.json'
+database_filename = 'database/main.db'
+coref_data_filename = 'application/app/src/main/assets/re.json'
 
 conn = None
 try:
@@ -16,11 +16,11 @@ except Error as e:
 
 coref_data = {
   "datasets": [
-    {"name": "spouse",
+    {"dataset":"WEXEA_v1", "name": "spouse",
       "annotations_1": 0, "annotations_2": 0, "annotations_3": 0, "once": 0, "twice": 0, "full": 0, "types": ["PER","LOC","ORG","MISC"], "system":"flat"},
-    {"name": "ceo_of",
+    {"dataset":"WEXEA_v1", "name": "ceo_of",
       "annotations_1": 0, "annotations_2": 0, "annotations_3": 0, "once": 0, "twice": 0, "full": 0, "types": ["PER","LOC","ORG","MISC"], "system":"flat"},
-    {"name": "date_of_birth",
+    {"dataset":"WEXEA_v1", "name": "date_of_birth",
       "annotations_1": 0, "annotations_2": 0, "annotations_3": 0, "once": 0, "twice": 0, "full": 0, "types":
          {"PER":["ACTOR","DOCTOR","ATHLETE","POLITICIAN","PER"],
           "LOC":["CITY","COUNTRY","STATE","LOC"],
@@ -34,7 +34,7 @@ for d in relations:
     dataset_name = d
     cur = conn.cursor()
 
-    sql = "SELECT r.article, r.line, s.data, r.annotator_1, r.annotator_2, r.annotator_3  FROM " + dataset_name + " r, sentence s WHERE r.article = s.article AND r.line = s.line AND s.response != -2 " \
+    sql = "SELECT r.article, r.line, s.data, r.annotator_1, r.annotator_2, r.annotator_3  FROM " + dataset_name + " r, WEXEA_v1 s WHERE r.article = s.article AND r.line = s.line AND s.response != -2 " \
                                                                                                                    "AND (annotator_1 IS NULL) LIMIT 10000;"
     cur.execute(sql)
     rows = cur.fetchall()

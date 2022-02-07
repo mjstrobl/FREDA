@@ -46,7 +46,7 @@ public class CommunicationHandler {
         this.reData = readFile("relations.json","assets");
         this.crData = readFile("coref.json","assets");
         this.nerData = readFile("ner.json","assets");
-        this.elData = readFile("coref.json","assets");
+        this.elData = readFile("el.json","assets");
 
 
         String downloads_directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
@@ -190,30 +190,21 @@ public class CommunicationHandler {
                         if (task.equals("EL")) {
                             // annotator asks for candidates
                             String mention = message.getString("mention");
-                            JSONObject candidates = new JSONObject();
+                            JSONArray candidates = new JSONArray();
+
                             if (message.has("wikiName")) {
-                                candidates.put(message.getString("wikiName"),"<no abstract available>");
+                                String[] tuple = {message.getString("wikiName"),"<no abstract available>"};
+                                candidates.put(new JSONArray(tuple));
                             }
                             if (elAliases.has(mention)) {
                                 JSONArray entities = elAliases.getJSONArray(mention);
                                 for (int i = 0; i < entities.length(); i++) {
                                     String candidate = entities.getString(i);
                                     if (elAbstracts.has(candidate)) {
-                                        System.out.println(elAbstracts.getString(candidate));
-                                        candidates.put(candidate,elAbstracts.getString(candidate));
+                                        String[] tuple = {candidate, elAbstracts.getString(candidate)};
+                                        candidates.put(new JSONArray(tuple));
                                     }
                                 }
-
-                                candidates.put("1","asfdsfdsfds");
-                                candidates.put("2","asfdsfdsfds");
-                                candidates.put("3","asfdsfdsfds");
-                                candidates.put("4","asfdsfdsfds");
-                                candidates.put("5","asfdsfdsfds");
-                                candidates.put("6","asfdsfdsfds");
-                                candidates.put("7","asfdsfdsfds");
-                                candidates.put("8","v");
-                                candidates.put("9","asfdsfdsfds");
-                                candidates.put("10","asfdsfdsfds");
                             }
                             message.put("candidates",candidates);
                             mainActivity.receiveMessage(message);

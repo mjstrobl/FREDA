@@ -89,6 +89,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 } else {
                     currentDatasetInfo = currentDatasetName;
                 }
+                System.out.println(activity.comHandler.getDataset());
                 currentDatasetSource = activity.comHandler.getDataset().getString("dataset");
 
                 uidTextView.setText(activity.getUID());
