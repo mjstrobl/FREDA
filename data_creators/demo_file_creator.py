@@ -5,7 +5,7 @@ from json.decoder import JSONDecodeError
 from sqlite3 import Error
 
 database_filename = 'database/main.db'
-coref_data_filename = 'application/app/src/main/assets/re.json'
+coref_data_filename = 'application/app/src/main/assets/el.json'
 
 conn = None
 try:
@@ -16,11 +16,11 @@ except Error as e:
 
 coref_data = {
   "datasets": [
-    {"dataset":"WEXEA_v1", "name": "spouse",
+    {"dataset":"WEXEA_v1", "language": "en", "name": "spouse",
       "annotations_1": 0, "annotations_2": 0, "annotations_3": 0, "once": 0, "twice": 0, "full": 0, "types": ["PER","LOC","ORG","MISC"], "system":"flat"},
-    {"dataset":"WEXEA_v1", "name": "ceo_of",
+    {"dataset":"WEXEA_v1", "language": "en", "name": "ceo_of",
       "annotations_1": 0, "annotations_2": 0, "annotations_3": 0, "once": 0, "twice": 0, "full": 0, "types": ["PER","LOC","ORG","MISC"], "system":"flat"},
-    {"dataset":"WEXEA_v1", "name": "date_of_birth",
+    {"dataset":"WEXEA_v1", "language": "en", "name": "date_of_birth",
       "annotations_1": 0, "annotations_2": 0, "annotations_3": 0, "once": 0, "twice": 0, "full": 0, "types":
          {"PER":["ACTOR","DOCTOR","ATHLETE","POLITICIAN","PER"],
           "LOC":["CITY","COUNTRY","STATE","LOC"],
@@ -72,6 +72,7 @@ for d in relations:
         dict['line'] = line
         dict['entities'] = dict['annotations'][0]
         dict['annotator'] = annotator
+        dict['language'] = annotator
 
         dict['mode'] = 1
         if dict['sentence'][-1] == '.' and len(result) < 1000:

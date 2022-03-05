@@ -4,21 +4,22 @@ class OverviewManager:
     def get_datasets(self, conn, uid, task):
         c = conn.cursor()
         if task == "RE":
-            c.execute("SELECT name, dataset, info_short, data, status FROM dataset_RE;")
+            c.execute("SELECT name, language, dataset, info_short, data, status FROM dataset_RE;")
         elif task == "EL":
-            c.execute("SELECT name, dataset, info_short, data, status FROM dataset_EL;")
+            c.execute("SELECT name, language, dataset, info_short, data, status FROM dataset_EL;")
         elif task == "CR":
-            c.execute("SELECT name, dataset, info_short, data, status FROM dataset_CR;")
+            c.execute("SELECT name, language, dataset, info_short, data, status FROM dataset_CR;")
         elif task == "NER":
-            c.execute("SELECT name, dataset, info_short, data, status FROM dataset_NER;")
+            c.execute("SELECT name, language, dataset, info_short, data, status FROM dataset_NER;")
 
         datasets = []
         for row in c:
             dataset_name = row[0]
-            dataset_source = row[1]
-            info_short = row[2]
-            dataset = json.loads(row[3])
-            status = row[4]
+            language = row[1]
+            dataset_source = row[2]
+            info_short = row[3]
+            dataset = json.loads(row[4])
+            status = row[5]
 
             if status == 0:
                 continue
@@ -27,6 +28,7 @@ class OverviewManager:
             dataset['name'] = dataset_name
             dataset['info_short'] = info_short
             dataset['dataset'] = dataset_source
+            dataset['language'] = language
 
             cur = conn.cursor()
 

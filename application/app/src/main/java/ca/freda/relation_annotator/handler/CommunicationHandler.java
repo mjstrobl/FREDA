@@ -43,7 +43,7 @@ public class CommunicationHandler {
     public CommunicationHandler(MainActivity mainActivity, String uid) {
         this.mainActivity = mainActivity;
         this.uid = uid;
-        this.reData = readFile("relations.json","assets");
+        this.reData = readFile("re.json","assets");
         this.crData = readFile("coref.json","assets");
         this.nerData = readFile("ner.json","assets");
         this.elData = readFile("el.json","assets");

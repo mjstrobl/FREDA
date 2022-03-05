@@ -339,7 +339,7 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
             }
         } else {
             fillEntityButtonScrollView();
-            fillTextView(false);
+            fillTextView(true);
         }
     }
 }

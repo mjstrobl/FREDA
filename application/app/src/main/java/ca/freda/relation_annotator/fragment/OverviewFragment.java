@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -15,6 +16,9 @@ import androidx.fragment.app.Fragment;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import ca.freda.relation_annotator.MainActivity;
 import ca.freda.relation_annotator.R;
@@ -83,16 +87,24 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
         textView1.setText("Relation");
         textView1.setTextSize(22);
 
+        TextView textView8 = new TextView(activity);
+        textView8.setText("Source");
+        textView8.setTextSize(22);
+
+        TextView textView9 = new TextView(activity);
+        textView9.setText("Lang.");
+        textView9.setTextSize(22);
+
         TextView textView2 = new TextView(activity);
-        textView2.setText("Annotations 1");
+        textView2.setText("Annot. 1");
         textView2.setTextSize(22);
 
         TextView textView3 = new TextView(activity);
-        textView3.setText("Annotations 2");
+        textView3.setText("Annot. 2");
         textView3.setTextSize(22);
 
         TextView textView4 = new TextView(activity);
-        textView4.setText("Annotations 3");
+        textView4.setText("Annot. 3");
         textView4.setTextSize(22);
 
         TextView textView5 = new TextView(activity);
@@ -108,6 +120,8 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
         textView7.setTextSize(22);
 
         tableRow.addView(textView1);
+        tableRow.addView(textView8);
+        tableRow.addView(textView9);
         tableRow.addView(textView2);
         tableRow.addView(textView3);
         tableRow.addView(textView4);
@@ -116,11 +130,29 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
         tableRow.addView(textView7);
         tableLayout.addView(tableRow);
 
-
+        Set<String> languages = new HashSet<>();
+        if (((CheckBox)rootView.findViewById(R.id.checkBox_en)).isChecked()) {
+            languages.add("en");
+        }
+        if (((CheckBox)rootView.findViewById(R.id.checkBox_de)).isChecked()) {
+            languages.add("de");
+        }
+        if (((CheckBox)rootView.findViewById(R.id.checkBox_fr)).isChecked()) {
+            languages.add("fr");
+        }
+        if (((CheckBox)rootView.findViewById(R.id.checkBox_es)).isChecked()) {
+            languages.add("es");
+        }
 
         for (int i = 0; i < datasets.length(); i++) {
             final JSONObject dataset = datasets.getJSONObject(i);
             final String datasetName = dataset.getString("name");
+            String datasetSource = dataset.getString("dataset");
+            String language = dataset.getString("language");
+            if (!languages.contains(language)) {
+                continue;
+            }
+
             int annotations_1 = dataset.getInt("annotations_1");
             int annotations_2 = dataset.getInt("annotations_2");
             int annotations_3 = dataset.getInt("annotations_3");
@@ -139,6 +171,12 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
                     activity.setPagerItem(overviewPagerItem);
                 }
             });
+
+            TextView textViewRows7 = new TextView(activity);
+            textViewRows7.setText(datasetSource);
+
+            TextView textViewRows8 = new TextView(activity);
+            textViewRows8.setText(language);
 
             TextView textViewRows1 = new TextView(activity);
             textViewRows1.setText(annotations_1 + "");
@@ -160,6 +198,8 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
 
             tableRow = new TableRow(activity);
             tableRow.addView(nameButton);
+            tableRow.addView(textViewRows7);
+            tableRow.addView(textViewRows8);
             tableRow.addView(textViewRows1);
             tableRow.addView(textViewRows2);
             tableRow.addView(textViewRows3);
