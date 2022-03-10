@@ -183,6 +183,10 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
                 JSONArray positionsJSON = annotation.getJSONArray("positions");
                 EntityButtonProperty property = EntityButtonProperty.NONE;
 
+                if (annotation.has("type")) {
+                    property = EntityButtonProperty.NERTYPE;
+                }
+
                 List<Position> positions = new ArrayList<>(positionsJSON.length());
                 for (int j = 0; j < positionsJSON.length(); j++) {
                     JSONArray currentPosition = positionsJSON.getJSONArray(j);
@@ -198,7 +202,10 @@ public class NERAnnotationFragment extends AnnotationFragment implements View.On
                 }
                 if (positions.size() > 0) {
                     int colour = getNewEntityColour();
-                    data.addEntity(colour, property, positions);
+                    Entity entity = data.addEntity(colour, property, positions);
+                    if (property == EntityButtonProperty.NERTYPE) {
+                        entity.setType(annotation.getString("type"));
+                    }
                     usedColours.add(colour);
                 }
             }

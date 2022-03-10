@@ -27,7 +27,7 @@ public class ClientHandler extends Handler {
 
     private static final int SERVERPORT = 4444;
     //private static final String SERVERIP = "199.116.235.147";
-    private static final String SERVERIP = "192.168.178.25";
+    private static final String SERVERIP = "192.168.2.130";
 
     public ClientHandler(Looper myLooper, MainActivity mainActivity) {
         super(myLooper);
