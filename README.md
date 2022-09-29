@@ -2,7 +2,13 @@
 
 Fast Relation Extraction Data Annotation
 
+See our paper on Arxiv: https://arxiv.org/abs/2204.07150
+
 Current database (`database/main.tar.xz`) contains at least 500 annotated sentences for 19 relations. In addition, four more relations are added without any annotations so far.
+
+# Acknowledgements
+
+We would like to thank all the data annotators for their hard work towards creating these datasets.
 
 # Get Started
 
