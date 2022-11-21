@@ -2,9 +2,21 @@
 
 Fast Relation Extraction Data Annotation
 
+See our paper on Arxiv: https://arxiv.org/abs/2204.07150
+
+FREDA can be used to manually annotate sentences quickly and accurately. A simple procedure for sentence acquisition from a partially annotated Wikipedia-based corpus is provided to be able to create datasets for new relations.
+
+In addition, FREDA can also be used to annotate datasets for the tasks Named Entity Recognition, Co-reference Resolution and Entity Linking.
+
 Current database (`database/main.tar.xz`) contains at least 500 annotated sentences for 19 relations. In addition, four more relations are added without any annotations so far.
 
+# Acknowledgements
+
+We would like to thank all the data annotators for their hard work towards creating these datasets.
+
 # Get Started
+
+(In offline mode, i.e. demo mode, the remaining steps can be skipped, apart from uploading the Android app to your device or an emulator. Just select the task to annotate for, examples are provided. However, this mode is only for demonstration purposes, annotations are not stored.)
 
 Decompress database in `database/`:
 
