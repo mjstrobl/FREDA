@@ -10,7 +10,7 @@ public class Data {
     private String sentence;
     private List<Entity> entities;
     private List<Map<String,Object>> words;
-    private Map<Integer,List<Entity>> entityAnnotations;
+    private Map<Integer,Entity> entityAnnotations;
 
     public Data(String sentence) {
         this.entities = new ArrayList<>();
@@ -29,8 +29,10 @@ public class Data {
         return entities.size();
     }
 
-    public void addEntity(int colour, EntityButtonProperty property, List<Position> positions) {
-        Entity entity = new Entity(colour,property,positions);
+
+
+    public void addEntity(int colour, List<Position> positions, String wikiName) {
+        Entity entity = new Entity(colour,positions, wikiName);
         entity.findName(this);
         entities.add(entity);
 
@@ -43,6 +45,29 @@ public class Data {
 
     }
 
+    public Entity addEntity(int colour, EntityButtonProperty property, List<Position> positions) {
+        Entity entity = new Entity(colour,property,positions);
+        entity.findName(this);
+        entities.add(entity);
+
+        Collections.sort(entities, new Comparator<Entity>() {
+
+            public int compare(Entity o1, Entity o2) {
+                return Integer.compare(o1.getPositions().get(0).start,o2.getPositions().get(0).start);
+            }
+        });
+        return entity;
+    }
+
+    public int findIndexForEntity(Entity entity) {
+        System.out.println("WE have no. entities: " + entities.size());
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i) == entity) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     public void createAnnotations() {
         entityAnnotations = new HashMap<>();
@@ -53,10 +78,7 @@ public class Data {
                 int start = position.start;
                 int length = position.length;
                 for (int j = start; j < start+length; j++) {
-                    if (!entityAnnotations.containsKey(j)) {
-                        entityAnnotations.put(j,new ArrayList<Entity>());
-                    }
-                    entityAnnotations.get(j).add(entity);
+                    entityAnnotations.put(j,entity);
                 }
             }
         }
@@ -107,7 +129,7 @@ public class Data {
         wordMap.put("word", word);
         wordMap.put("start", start);
         wordMap.put("length", word.length());
-        wordMap.put("entities",entityAnnotations.get(start));
+        wordMap.put("entity",entityAnnotations.get(start));
 
         words.add(wordMap);
     }

@@ -4,20 +4,21 @@ import android.view.View;
 import android.widget.Button;
 
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
+import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
 
 public class EntityButtonOnClickListener implements View.OnClickListener {
 
-    public AnnotationFragment mainActivity;
+    public AnnotationFragment annotationFragment;
 
-    public EntityButtonOnClickListener(AnnotationFragment mainActivity) {
-        this.mainActivity = mainActivity;
+    public EntityButtonOnClickListener(AnnotationFragment annotationFragment) {
+        this.annotationFragment = annotationFragment;
     }
 
     @Override
     public void onClick(View v) {
         int tag = (int)v.getTag();
         Button button = (Button) v;
-        mainActivity.entityButtonClicked(tag,button);
+        annotationFragment.entityButtonClicked(tag,button, null);
 
     }
 }

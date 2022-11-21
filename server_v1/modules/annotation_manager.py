@@ -6,6 +6,7 @@ class AnnotationManager:
     def __init__(self):
         self.previous_article = ""
         self.previous_line = -1
+        #self.previous_response = -3
         self.current_relation = ""
         self.current_annotators = {}
         self.previous_annotators = {}
@@ -38,7 +39,7 @@ class AnnotationManager:
 
         response = dict['response']
         if response == -2:
-            sql = "UPDATE sentence SET status = 0 WHERE article = ? AND line = ?;"
+            sql = "UPDATE sentence SET response = -2 WHERE article = ? AND line = ?;"
             cur.execute(sql, (dict['article'], dict['line']))
 
         conn.commit()
@@ -48,7 +49,7 @@ class AnnotationManager:
     def get_sample_from_database(self, conn, relation_name, uid):
         cur = conn.cursor()
 
-        sql = "SELECT r.article, r.line, s.data, r.annotator_1, r.annotator_2, r.annotator_3  FROM " + relation_name + " r, sentence s WHERE r.article = s.article AND r.line = s.line AND s.status = 1 " \
+        sql = "SELECT r.article, r.line, s.data, r.annotator_1, r.annotator_2, r.annotator_3  FROM " + relation_name + " r, sentence s WHERE r.article = s.article AND r.line = s.line AND s.response != -2 " \
                 "AND (annotator_1 != ? OR annotator_1 IS NULL) AND (annotator_2 != ? OR annotator_2 IS NULL) AND (annotator_3 != ? OR annotator_3 IS NULL) " \
                 "AND (response_1 != -1 OR response_1 IS NULL) AND (response_2 != -1 OR response_2 IS NULL) AND (response_3 != -1 OR response_3 IS NULL) " \
                 "AND (response_1 IS NULL OR response_2 IS NULL OR (response_1 != response_2 AND response_3 IS NULL)) LIMIT 1;"
@@ -96,7 +97,7 @@ class AnnotationManager:
 
             dict['article'] = article
             dict['line'] = line
-            dict['entities'] = dict['annotations'][-1]
+            dict['entities'] = dict['annotations'][0]
             dict['subjects'] = []
             dict['objects'] = []
             dict['annotator'] = annotator
@@ -128,9 +129,18 @@ class AnnotationManager:
         cur.execute(sql, (self.previous_article, self.previous_line))
 
         if self.previous_response == -2:
-            sql = "UPDATE sentence SET status = 1 WHERE article = ? AND line = ?;"
+            sql = "UPDATE sentence SET response = 0 WHERE article = ? AND line = ?;"
             cur.execute(sql, (self.previous_article, self.previous_line))
 
         self.previous_line = -1
 
+
         conn.commit()
+
+
+def main():
+    config = json.load(open('../config.json'))
+    print(config)
+
+if __name__ == "__main__":
+    main()

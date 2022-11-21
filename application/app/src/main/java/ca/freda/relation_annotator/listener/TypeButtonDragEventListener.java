@@ -1,17 +1,21 @@
 package ca.freda.relation_annotator.listener;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.DragEvent;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
+
+import ca.freda.relation_annotator.R;
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
-import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
+import ca.freda.relation_annotator.fragment.NER.NERAnnotationFragment;
 
-public class GarbageViewDragEventListener implements View.OnDragListener {
+public class TypeButtonDragEventListener implements View.OnDragListener {
 
-    public AnnotationFragment annotationFragment;
+    public NERAnnotationFragment annotationFragment;
 
-    public GarbageViewDragEventListener(AnnotationFragment annotationFragment) {
+    public TypeButtonDragEventListener(NERAnnotationFragment annotationFragment) {
         this.annotationFragment = annotationFragment;
     }
 
@@ -32,19 +36,23 @@ public class GarbageViewDragEventListener implements View.OnDragListener {
                 String text = (String)event.getClipDescription().getLabel();
                 System.out.println(text);
                 //if (text.contains("entity")) {
-                    v.invalidate();
-                    return true;
+                v.invalidate();
+                return true;
                 //}
                 //return false;
             }
 
-            case DragEvent.ACTION_DRAG_ENTERED:
+            case DragEvent.ACTION_DRAG_ENTERED: {
                 System.out.println("ACTION_DRAG_ENTERED");
-                v.setBackgroundColor(Color.GREEN);
+                String text = (String) event.getClipDescription().getLabel();
+                if (text.contains("entity") || text.contains("word")) {
+                    //v.setBackgroundColor(Color.GREEN);
+                    v.getBackground().setColorFilter(Color.GREEN,PorterDuff.Mode.MULTIPLY);
+                }
                 v.invalidate();
 
                 return true;
-
+            }
             case DragEvent.ACTION_DRAG_LOCATION:
                 //System.out.println("ACTION_DRAG_LOCATION");
                 // Ignore the event
@@ -52,31 +60,33 @@ public class GarbageViewDragEventListener implements View.OnDragListener {
 
             case DragEvent.ACTION_DRAG_EXITED:
                 System.out.println("ACTION_DRAG_EXITED");
-                v.setBackgroundColor(Color.LTGRAY);
+                v.getBackground().setColorFilter(Color.LTGRAY,PorterDuff.Mode.MULTIPLY);
                 v.invalidate();
 
                 return true;
 
-            case DragEvent.ACTION_DROP:
+            case DragEvent.ACTION_DROP: {
                 System.out.println("ACTION_DROP");
                 // Gets the item containing the dragged data
-                String text = (String)event.getClipDescription().getLabel();
+                String text = (String) event.getClipDescription().getLabel();
                 String[] tokens = text.split("_");
                 System.out.println("Item text: " + text);
-                int buttonId = Integer.parseInt(tokens[tokens.length-1]);
+                int buttonId = Integer.parseInt(tokens[tokens.length - 1]);
+                String type = (String) v.getTag();
                 if (text.contains("entity")) {
                     System.out.println("entity button id: " + buttonId);
-                    annotationFragment.removeEntity(buttonId);
-                } else if (text.contains("wordview")) {
-                    System.out.println("wordview id: " + buttonId);
-                    annotationFragment.removeWordFromPositions(buttonId);
+                    annotationFragment.setEntityType(type, buttonId);
+                } else if (text.contains("word")) {
+                    System.out.println("entity button id: " + buttonId);
+                    annotationFragment.addEntityToType(type, buttonId);
                 }
 
+                annotationFragment.reloadViews(true);
 
                 return true;
-
+            }
             case DragEvent.ACTION_DRAG_ENDED:
-                v.setBackgroundColor(Color.LTGRAY);
+                v.getBackground().setColorFilter(Color.LTGRAY,PorterDuff.Mode.MULTIPLY);
                 return true;
 
             // An unknown action type was received.

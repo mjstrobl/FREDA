@@ -5,13 +5,14 @@ import android.view.DragEvent;
 import android.view.View;
 
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
+import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
 
 public class EntityScrollviewDragEventListener implements View.OnDragListener {
 
-    private AnnotationFragment mainActivity;
+    private AnnotationFragment annotationFragment;
 
-    public EntityScrollviewDragEventListener(AnnotationFragment mainActivity) {
-        this.mainActivity = mainActivity;
+    public EntityScrollviewDragEventListener(AnnotationFragment annotationFragment) {
+        this.annotationFragment = annotationFragment;
     }
 
     public boolean onDrag(View v, DragEvent event) {
@@ -57,11 +58,10 @@ public class EntityScrollviewDragEventListener implements View.OnDragListener {
                 int index = Integer.parseInt(tokens[tokens.length-1]);
 
                 if (text.contains("wordview")) {
-                    mainActivity.addEntity(index, null);
+                    annotationFragment.addEntity(index, null);
                 }
 
-
-                mainActivity.reloadViews();
+                annotationFragment.reloadViews(true);
 
                 v.invalidate();
                 return true;

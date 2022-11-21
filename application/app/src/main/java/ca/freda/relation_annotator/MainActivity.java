@@ -1,12 +1,5 @@
 package ca.freda.relation_annotator;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,28 +8,38 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
 
-import ca.freda.relation_annotator.fragment.AnnotationFragment;
-import ca.freda.relation_annotator.fragment.RelationDataCreatorFragment;
-import ca.freda.relation_annotator.handler.ClientHandler;
-import ca.freda.relation_annotator.handler.ServerHandler;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.UUID;
 
+import ca.freda.relation_annotator.fragment.StartFragment;
+import ca.freda.relation_annotator.handler.ClientHandler;
+import ca.freda.relation_annotator.handler.CommunicationHandler;
+import ca.freda.relation_annotator.handler.ServerHandler;
+
+import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
+import ca.freda.relation_annotator.fragment.RE.REOverviewFragment;
+import ca.freda.relation_annotator.fragment.EL.ELAnnotationFragment;
+import ca.freda.relation_annotator.fragment.EL.ELOverviewFragment;
+import ca.freda.relation_annotator.fragment.NER.NERAnnotationFragment;
+import ca.freda.relation_annotator.fragment.NER.NEROverviewFragment;
+import ca.freda.relation_annotator.fragment.CR.CRAnnotationFragment;
+import ca.freda.relation_annotator.fragment.CR.CROverviewFragment;
+
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * The number of pages (wizard steps) to show in this demo.
-     */
-    private static final int NUM_PAGES = 2;
+    private static final int NUM_PAGES = 9;
 
-    private JSONObject relation;
+
     private String uid;
-    private ClientHandler clientHandler;
-    private ServerHandler serverHandler;
-    private HandlerThread clientThread;
+    public CommunicationHandler comHandler;
 
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
@@ -63,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(pagerAdapter);
         mPager.disableScroll(true);
+        mPager.setOffscreenPageLimit(NUM_PAGES);
+
 
         SharedPreferences preferences = getApplicationContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
         if (preferences.contains("uid")) {
@@ -74,47 +79,39 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
         }
 
-        //uid = "<SET UID>";
+        uid = "0520f3ec-5831-4be4-9416-51b39810512d";
+
+        comHandler = new CommunicationHandler(this,uid);
+
+
 
         System.out.println("UID: " + uid);
 
-        startClient();
-    }
 
-    private void startClient() {
-        System.out.println("start client");
-        clientThread = new HandlerThread("Socket Thread");
-        clientThread.start();
-        Looper mLooper = clientThread.getLooper();
-        serverHandler = new ServerHandler(getMainLooper(),this);
-        clientHandler = new ClientHandler(mLooper,this);
     }
 
 
-    public void restartClient() {
-        System.out.println("reset client");
-        clientThread.interrupt();
-        startClient();
-        //switchButtonState(true);
-    }
 
-    public Message obtainMessage() {
-        return clientHandler.obtainMessage();
-    }
 
-    public void sendMessage(Message message) {
-        clientHandler.sendMessage(message);
-    }
 
     public void receiveMessage(JSONObject message) throws JSONException {
         int mode = message.getInt("mode");
+        String task = message.getString("task");
 
         switch (mode) {
             case 1: {
                 if (message.getString("article") == null) {
                     showToast("No data available for this relation and annotator!");
                 } else {
-                    pagerAdapter.annotationFragment.createData(message);
+                    if (task.equals("RE")) {
+                        pagerAdapter.reAnnotationFragment.createData(message);
+                    } else if (task.equals("CR")) {
+                        pagerAdapter.crAnnotationFragment.createData(message);
+                    } else if (task.equals("NER")) {
+                        pagerAdapter.nerAnnotationFragment.createData(message);
+                    } else if (task.equals("EL")) {
+                        pagerAdapter.elAnnotationFragment.createData(message);
+                    }
                 }
                 break;
             }
@@ -124,7 +121,22 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case 5: {
-                pagerAdapter.relationDataCreatorFragment.showRelations(message.getJSONArray("relations"));
+                if (task.equals("RE")) {
+                    pagerAdapter.reOverviewFragment.showDatasets(message.getJSONArray("datasets"));
+                } else if (task.equals("CR")) {
+                    pagerAdapter.crOverviewFragment.showDatasets(message.getJSONArray("datasets"));
+                } else if (task.equals("NER")) {
+                    pagerAdapter.nerOverviewFragment.showDatasets(message.getJSONArray("datasets"));
+                } else if (task.equals("EL")) {
+                    pagerAdapter.elOverviewFragment.showDatasets(message.getJSONArray("datasets"));
+                }
+                break;
+            }
+            case 6: {
+                if (task.equals("EL")) {
+                    System.out.println(message);
+                    pagerAdapter.elAnnotationFragment.showCandidates(message.getJSONArray("candidates"), message.getInt("index"));
+                }
                 break;
             }
             case -2: {
@@ -132,7 +144,8 @@ public class MainActivity extends AppCompatActivity {
                     showToast(message.getString("message"));
                 } else {
                     showToast("Something went wrong, ask for data again.");
-                    sendMessageWithMode(1);
+                    message.put("mode",1);
+                    comHandler.sendMessage(message);
                 }
 
                 break;
@@ -153,27 +166,7 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
-    public void passMessageToServerHandler(Message msg) {
-        this.serverHandler.sendMessage(msg);
-    }
 
-
-    /*
-    Rest of the methods.
-     */
-    public void sendMessageWithMode(int mode) {
-        try {
-            JSONObject object = new JSONObject();
-            object.put("mode", mode);
-            object.put("uid",uid);
-            if (relation != null) {
-                object.put("relation", relation.getString("name"));
-            }
-            clientHandler.sendMessage(object);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -187,20 +180,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public JSONObject getRelation() {
-        return relation;
-    }
 
-    public void setRelation(JSONObject relation) {
-        this.relation = relation;
-    }
 
     public String getUID() {
         return uid;
     }
 
     public void setPagerItem(int item) {
-        pagerAdapter.annotationFragment.removeData();
         System.out.println("set pager item: " + item);
         mPager.setCurrentItem(item);
     }
@@ -211,8 +197,19 @@ public class MainActivity extends AppCompatActivity {
      */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        public RelationDataCreatorFragment relationDataCreatorFragment;
-        public AnnotationFragment annotationFragment;
+        public StartFragment startFragment;
+
+        public REOverviewFragment reOverviewFragment;
+        public REAnnotationFragment reAnnotationFragment;
+
+        public ELOverviewFragment elOverviewFragment;
+        public ELAnnotationFragment elAnnotationFragment;
+
+        public CROverviewFragment crOverviewFragment;
+        public CRAnnotationFragment crAnnotationFragment;
+
+        public NEROverviewFragment nerOverviewFragment;
+        public NERAnnotationFragment nerAnnotationFragment;
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -223,12 +220,40 @@ public class MainActivity extends AppCompatActivity {
             System.out.println("get item: " + position);
             switch (position) {
                 case 0: {
-                    relationDataCreatorFragment = new RelationDataCreatorFragment();
-                    return relationDataCreatorFragment;
+                    startFragment = new StartFragment();
+                    return startFragment;
                 }
                 case 1: {
-                    annotationFragment = new AnnotationFragment();
-                    return annotationFragment;
+                    nerOverviewFragment = new NEROverviewFragment();
+                    return nerOverviewFragment;
+                }
+                case 2: {
+                    crOverviewFragment = new CROverviewFragment();
+                    return crOverviewFragment;
+                }
+                case 3: {
+                    elOverviewFragment = new ELOverviewFragment();
+                    return elOverviewFragment;
+                }
+                case 4: {
+                    reOverviewFragment = new REOverviewFragment();
+                    return reOverviewFragment;
+                }
+                case 5: {
+                    nerAnnotationFragment = new NERAnnotationFragment();
+                    return nerAnnotationFragment;
+                }
+                case 6: {
+                    crAnnotationFragment = new CRAnnotationFragment();
+                    return crAnnotationFragment;
+                }
+                case 7: {
+                    elAnnotationFragment = new ELAnnotationFragment();
+                    return elAnnotationFragment;
+                }
+                case 8: {
+                    reAnnotationFragment = new REAnnotationFragment();
+                    return reAnnotationFragment;
                 }
                 default:
                     return null;

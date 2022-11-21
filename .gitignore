@@ -1,5 +1,9 @@
-database/*.db
+database/*
+*.json
 .idea/
+nyt/*
+main.db
+
 
 application/app/build.gradle
 application/app/proguard-rules.pro

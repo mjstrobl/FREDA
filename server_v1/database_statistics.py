@@ -3,7 +3,7 @@ from sqlite3 import Error
 import json
 
 
-config = json.load(open('config/config.json'))
+config = json.load(open('../config/config.json'))
 
 conn = None
 try:
