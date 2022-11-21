@@ -29,12 +29,14 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
     private MainActivity activity;
     protected String task;
     protected int overviewPagerItem;
+    private JSONArray datasets;
 
 
     @Override
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
         setVariables();
+        this.datasets = null;
     }
 
     protected void setVariables() {
@@ -43,16 +45,32 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
     protected void fillRootView() {
         rootView.findViewById(R.id.dataset_get_button).setOnClickListener(this);
         rootView.findViewById(R.id.button_main_menu).setOnClickListener(this);
+        rootView.findViewById(R.id.checkBox_en).setOnClickListener(this);
+        rootView.findViewById(R.id.checkBox_de).setOnClickListener(this);
+        rootView.findViewById(R.id.checkBox_fr).setOnClickListener(this);
+        rootView.findViewById(R.id.checkBox_es).setOnClickListener(this);
 
         activity = (MainActivity) getActivity();
 
         TextView uidTextView = rootView.findViewById(R.id.device_uid_textview);
         uidTextView.setText(activity.getUID());
+
+        System.out.println("fill root view");
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.checkBox_en:
+            case R.id.checkBox_de:
+            case R.id.checkBox_es:
+            case R.id.checkBox_fr:
+                try {
+                    this.showDatasets(null);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
             case R.id.dataset_get_button:
                 ScrollView scrollView = rootView.findViewById(R.id.dataset_scrollview);
                 scrollView.removeAllViews();
@@ -74,6 +92,11 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
     }
 
     public void showDatasets(JSONArray datasets)throws JSONException {
+        if (datasets == null) {
+            datasets = this.datasets;
+        } else {
+            this.datasets = datasets;
+        }
         System.out.println(datasets);
         TableLayout tableLayout = new TableLayout(activity);
         tableLayout.setOrientation(LinearLayout.VERTICAL);

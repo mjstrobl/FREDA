@@ -81,6 +81,8 @@ public class TypeButtonDragEventListener implements View.OnDragListener {
                     annotationFragment.addEntityToType(type, buttonId);
                 }
 
+                annotationFragment.reloadViews(true);
+
                 return true;
             }
             case DragEvent.ACTION_DRAG_ENDED:

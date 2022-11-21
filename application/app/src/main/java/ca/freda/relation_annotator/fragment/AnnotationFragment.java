@@ -379,12 +379,15 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
     }
 
     public void fillWordButtonView() {
+        System.out.println("fill wordbuttion view");
         ScrollView scrollView = (ScrollView) rootView.findViewById(R.id.word_scrollview);
         scrollView.removeAllViews();
 
         if (data == null) {
             return;
         }
+
+        System.out.println("data not null");
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
