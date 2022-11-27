@@ -14,6 +14,24 @@ Current database (`database/main.tar.xz`) contains at least 500 annotated senten
 
 We would like to thank all the data annotators for their hard work towards creating these datasets.
 
+# Evaluation 
+
+Please see Michael Strobl's PhD thesis for an evaluation against the open-source system BRAT (https://brat.nlplab.org/). Here are links to the videos the evaluation is based on:
+
+BRAT RE: https://drive.google.com/file/d/1q5MKxxk5kSgVGn_VDt6Fif6HWHoMvkFL/view?usp=share_link
+
+BRAT CR: https://drive.google.com/file/d/16Vi2m-Nhz-2MZXhZYFb9Xv2ppfb453Eu/view?usp=share_link
+
+BRAT NER: https://drive.google.com/file/d/1h9Y2R2F05mF6ZitQRVHX3eDw3uiBZf4d/view?usp=share_link
+
+FREDA RE: https://drive.google.com/file/d/1vs6VIssuYI98NeT3k25dgxvyGY50NtHS/view?usp=share_link
+
+FREDA CR: https://drive.google.com/file/d/1vzVaXbluN_ixU5ELa7h_SDdqjsRmneJy/view?usp=share_link
+
+FREDA NER: https://drive.google.com/file/d/1w0_wLld92Hw82tdF90VIUaq0xOuerKSq/view?usp=share_link
+
+
+
 # Get Started
 
 (In offline mode, i.e. demo mode, the remaining steps can be skipped, apart from uploading the Android app to your device or an emulator. Just select the task to annotate for, examples are provided. However, this mode is only for demonstration purposes, annotations are not stored.)
@@ -39,13 +57,13 @@ In `config/config.json`:
 
 Replace `SERVERPORT` and `SERVERIP` in `application/app.src/main/java/ca/freda/relation_annotator/handler/ClientHandler.java` with your values.
 
-# Start Annotations
+# Start Annotations for Relation Extraction
 
 Server needs to be running when app is used.
 
 ## Server
 
-Start server: `python server/main.py`
+Start server: `python server_v1/main.py`
 
 ## Android Application
 
