@@ -30,7 +30,7 @@ FREDA CR: https://drive.google.com/file/d/1vzVaXbluN_ixU5ELa7h_SDdqjsRmneJy/view
 
 FREDA NER: https://drive.google.com/file/d/1w0_wLld92Hw82tdF90VIUaq0xOuerKSq/view?usp=share_link
 
-A stopwatch was added to each video asa sanity check. For the annotations conducted on the Android device, the clock can be seen on top.
+A stopwatch was added to each video as a sanity check. For the annotations conducted on the Android device, the clock can be seen on top.
 
 # Get Started
 
