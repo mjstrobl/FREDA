@@ -1,3 +1,7 @@
+# IMPORTANT
+
+This is still in progress and will change up until the conference end of March 2023.
+
 # FREDA
 
 Fast Relation Extraction Data Annotation
