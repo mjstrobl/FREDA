@@ -14,11 +14,15 @@ class OverviewManager:
 
         datasets = []
         for row in c:
+            print(row)
             dataset_name = row[0]
             language = row[1]
             dataset_source = row[2]
             info_short = row[3]
-            dataset = json.loads(row[4])
+            if row[4] is not None:
+                dataset = json.loads(row[4])
+            else:
+                dataset = {}
             status = row[5]
 
             if status == 0:
