@@ -5,7 +5,6 @@ import android.view.DragEvent;
 import android.view.View;
 
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
-import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
 
 public class EntityScrollviewDragEventListener implements View.OnDragListener {
 

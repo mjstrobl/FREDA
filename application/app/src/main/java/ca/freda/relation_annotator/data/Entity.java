@@ -16,8 +16,6 @@ public class Entity {
     private String name;
     private EntityButtonProperty property;
     private int colour;
-    private String wikiName;
-    private String type;
     private Set<String> restrictedWords = new HashSet<>(Arrays.asList("who", "he", "she", "his", "him", "her",
             "herself", "himself", "whom", "whose","where","which","this","that","we","us","our","ours","I","me","my","mine","myself",
             "ouselves","you","your","yours","yourself","yourselves","hers","it","its","itself","they","them","their","theirs","themself",
@@ -33,12 +31,6 @@ public class Entity {
     public Entity(int colour, List<Position> positions, String wikiName) {
         this.colour = colour;
         this.positions = positions;
-        this.wikiName = wikiName;
-        if (wikiName == null) {
-            this.property = EntityButtonProperty.NONE;
-        } else {
-            this.property = EntityButtonProperty.WIKINAME;
-        }
     }
 
     public void increaseProperty() {
@@ -142,33 +134,6 @@ public class Entity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        if (type == null || type.equals("NO TYPE")) {
-            this.property = EntityButtonProperty.NONE;
-        } else {
-            this.property = EntityButtonProperty.NERTYPE;
-        }
-
-        this.type = type;
-    }
-
-    public String getWikiName() {
-        return wikiName;
-    }
-
-    public void setWikiName(String wikiName) {
-        if (wikiName == null) {
-            this.property = EntityButtonProperty.NONE;
-        } else {
-            this.property = EntityButtonProperty.WIKINAME;
-        }
-        this.wikiName = wikiName;
     }
 
     public List<Position> getTextviewTextPositions() {

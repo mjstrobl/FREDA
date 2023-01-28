@@ -20,64 +20,22 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/device_uid_textview"
+            android:id="@+id/display_name_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:editable="false" />
 
         <Button
-            android:id="@+id/button_main_menu"
+            android:id="@+id/button_logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Main menu" />
+            android:text="Logout" />
 
         <Button
             android:id="@+id/dataset_get_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Get Relations" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:orientation="horizontal">
-
-            <CheckBox
-                android:id="@+id/checkBox_en"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:checked="true"
-                android:text="English"
-                tools:ignore="TouchTargetSizeCheck" />
-
-            <CheckBox
-                android:id="@+id/checkBox_de"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:checked="true"
-                android:text="German"
-                tools:ignore="TouchTargetSizeCheck" />
-
-            <CheckBox
-                android:id="@+id/checkBox_fr"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:checked="true"
-                android:text="French"
-                tools:ignore="TouchTargetSizeCheck" />
-
-            <CheckBox
-                android:id="@+id/checkBox_es"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:checked="true"
-                android:text="Spanish"
-                tools:ignore="TouchTargetSizeCheck" />
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

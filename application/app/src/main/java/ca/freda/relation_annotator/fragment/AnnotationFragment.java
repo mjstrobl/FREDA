@@ -61,9 +61,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
     protected String currentDatasetSource;
     protected MainActivity activity;
 
-    protected String task;
-    protected int overviewPagerItem;
-
     List<Map<String, Object>> allPositions;
     protected List<Button> responseButtons;
 
@@ -75,14 +72,20 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             "#9A6324", "#7f7b54", "#800000", "#538963", "#808000", "#694d32", "#000075", "#5a5a5a", "#000000"};
     protected Set<Integer> usedColours = new HashSet<>();
 
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        rootView = (ViewGroup) inflater.inflate(R.layout.annotation_slide_page, container, false);
+        fillRootView();
+        return rootView;
+    }
+
     @Override
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
-        setVariables();
         if (visible) {
             try {
-                TextView uidTextView = rootView.findViewById(R.id.uid_textview);
-
                 currentDatasetName = activity.comHandler.getDataset().getString("name");
                 if (activity.comHandler.getDataset().has("info_short")) {
                     currentDatasetInfo = activity.comHandler.getDataset().getString("info_short");
@@ -91,9 +94,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 }
                 System.out.println(activity.comHandler.getDataset());
                 currentDatasetSource = activity.comHandler.getDataset().getString("dataset");
-
-                uidTextView.setText(activity.getUID());
-
                 HorizontalScrollView scrollView = rootView.findViewById(R.id.response_scrollview);
                 scrollView.removeAllViews();
 
@@ -103,7 +103,9 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 layout.setOrientation(LinearLayout.HORIZONTAL);
 
                 // For different tasks it is possible to use different responses, for now yes/no (apart from ignore/remove) is enough.
-                Map<String,Integer> possibleResponses = setPossibleResponses();
+                Map<String,Integer> possibleResponses = new HashMap<>();
+                possibleResponses.put("yes",1);
+                possibleResponses.put("no",0);
 
                 responseButtons = new ArrayList<>();
 
@@ -135,7 +137,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
 
 
                 JSONObject message = new JSONObject();
-                message.put("task", task);
                 message.put("mode", 1);
                 message.put("datasetName", currentDatasetName);
                 message.put("datasetSource",currentDatasetSource);
@@ -148,13 +149,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
 
             System.out.println("Annotation Fragment visible.");
         }
-    }
-
-    protected void setVariables() {
-    }
-
-    protected Map<String,Integer> setPossibleResponses() {
-        return null;
     }
 
     protected void fillRootView() {
@@ -188,7 +182,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 switchButtonState(false);
                 try {
                     JSONObject message = new JSONObject();
-                    message.put("task", task);
                     message.put("mode", 4);
                     message.put("datasetName", currentDatasetName);
                     message.put("datasetSource",currentDatasetSource);
@@ -204,7 +197,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 if (currentServerMessage == null) {
                     try {
                         JSONObject message = new JSONObject();
-                        message.put("task", task);
                         message.put("datasetName", currentDatasetName);
                         message.put("datasetSource",currentDatasetSource);
                         message.put("mode", 1);
@@ -217,7 +209,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 }
                 break;
             case R.id.main_button_annotation:
-                activity.setPagerItem(overviewPagerItem);
+                activity.setPagerItem(1);
                 break;
             case R.id.annotation_ignore_button:
                 sendSampleResponse(-1);
@@ -251,11 +243,10 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             if (msg != null) {
                 JSONObject sampleObject = new JSONObject();
                 sampleObject.put("mode", 2);
-                sampleObject.put("task", task);
                 sampleObject.put("response", response);
                 sampleObject.put("datasetName", currentDatasetName);
                 sampleObject.put("datasetSource",currentDatasetSource);
-                sampleObject.put("uid", activity.getUID());
+                sampleObject.put("uid", activity.getUser().getUid());
                 sampleObject.put("article", currentServerMessage.getString("article"));
                 sampleObject.put("line", currentServerMessage.getInt("line"));
                 fillEntities(sampleObject);
@@ -265,7 +256,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             }
             System.out.println("Ask for new sample.");
             JSONObject message = new JSONObject();
-            message.put("task", task);
             message.put("mode", 1);
             message.put("datasetName", currentDatasetName);
             message.put("datasetSource",currentDatasetSource);
@@ -278,7 +268,26 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
     }
 
     protected void fillEntities(JSONObject sampleObject) throws JSONException {
+        JSONArray entities = new JSONArray();
+        JSONArray subjects = new JSONArray();
+        JSONArray objects = new JSONArray();
+        for (int i = 0; i < data.getNumEntities(); i++) {
+            Entity entity = data.getEntity(i);
+            fillEntity(entity, entities);
 
+            if (entity.getProperty() == EntityButtonProperty.SUBJECT) {
+                subjects.put(i);
+            } else if (entity.getProperty() == EntityButtonProperty.OBJECT) {
+                objects.put(i);
+            }
+        }
+        sampleObject.put("subjects",subjects);
+        sampleObject.put("objects",objects);
+
+        JSONObject entityAnnotations = new JSONObject();
+        entityAnnotations.put("entities",entities);
+
+        sampleObject.put("entities",entityAnnotations);
     }
 
     protected void fillEntity(Entity entity, JSONArray entities) throws JSONException {
@@ -298,12 +307,52 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
     }
 
     public void createData(JSONObject message) {
+        currentServerMessage = message;
+        HorizontalScrollView scrollView = rootView.findViewById(R.id.entity_scrollview);
+        scrollView.scrollTo(0, 0);
 
+        try {
+            // {"sentence": "In 2004, Kayla married David E. Tolbert.", "entity_subject": [[9, 5]], "entity_object": [[23, 16]], "id": 1, "mode": 1}
+            usedColours = new HashSet<>();
+            String sentence = currentServerMessage.getString("sentence");
+
+            data = new Data(sentence);
+            JSONArray annotations = currentServerMessage.getJSONObject("entities").getJSONArray("entities");
+
+            int annotator = currentServerMessage.getInt("annotator");
+            setDatasetTextviewText(annotator);
+
+            for(int i = 0; i < annotations.length(); i++) {
+                JSONObject annotation = annotations.getJSONObject(i);
+
+                JSONArray positionsJSON = annotation.getJSONArray("positions");
+                EntityButtonProperty property = EntityButtonProperty.NONE;
+
+                List<Position> positions = new ArrayList<>(positionsJSON.length());
+                for (int j = 0; j < positionsJSON.length(); j++) {
+                    JSONArray currentPosition = positionsJSON.getJSONArray(j);
+                    int start = currentPosition.getInt(0);
+                    int length = currentPosition.getInt(1);
+                    positions.add(new Position(start, length));
+                }
+
+                if (positions.size() > 0) {
+                    int colour = getNewEntityColour();
+                    data.addEntity(colour, property, positions);
+                    usedColours.add(colour);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        reloadViews(true);
+        switchButtonState(true);
     }
 
     protected void setDatasetTextviewText(int annotator) {
         TextView datasetTextView = rootView.findViewById(R.id.dataset_textview);
-        datasetTextView.setText("Annotator: " + annotator + ", Dataset: " + currentDatasetInfo);
+        datasetTextView.setText("Annotator: " + annotator + ", Relation: " + currentDatasetInfo);
     }
 
     public void fillTextView(boolean restart) {
@@ -500,7 +549,9 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
     }
 
     protected void setEntityButtonListeners(Button button) {
-
+        button.setOnClickListener(new EntityButtonOnClickListener(this));
+        button.setOnDragListener(new WordButtonDragEventListener(this,data.getEntity((int)button.getTag())));
+        button.setOnLongClickListener(new EntityViewLongClickListener());
     }
 
     private void setButtonLayout(Button button, Entity entity) {
@@ -516,19 +567,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             button.setPaintFlags(button.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             button.setTypeface(null, Typeface.BOLD);
             button.setText(String.format("%s (obj)", entity.getName()));
-        } else if (entity.getProperty() == EntityButtonProperty.NERTYPE) {
-            button.setPaintFlags(button.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-            button.setTypeface(null, Typeface.BOLD);
-            button.setText(String.format("%s (%s)", entity.getName(), entity.getType()));
-        } else if (entity.getProperty() == EntityButtonProperty.NONE) {
-            button.setPaintFlags(button.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
-            button.setTypeface(null, Typeface.NORMAL);
-            button.setText(entity.getName());
-        } else {
-            System.out.println("found wikiname for button: " + entity.getWikiName());
-            button.setPaintFlags(button.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-            button.setTypeface(null, Typeface.BOLD);
-            button.setText(entity.getWikiName());
         }
     }
 

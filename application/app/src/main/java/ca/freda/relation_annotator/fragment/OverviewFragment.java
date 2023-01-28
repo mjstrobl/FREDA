@@ -1,10 +1,11 @@
 package ca.freda.relation_annotator.fragment;
 
 import android.graphics.Color;
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -17,9 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import ca.freda.relation_annotator.MainActivity;
 import ca.freda.relation_annotator.R;
 
@@ -27,33 +25,33 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
 
     protected ViewGroup rootView;
     private MainActivity activity;
-    protected String task;
-    protected int overviewPagerItem;
     private JSONArray datasets;
 
 
     @Override
-    public void setUserVisibleHint(boolean visible) {
-        super.setUserVisibleHint(visible);
-        setVariables();
-        this.datasets = null;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        rootView = (ViewGroup) inflater.inflate(R.layout.overview_slide_page, container, false);
+        fillRootView();
+        return rootView;
     }
 
-    protected void setVariables() {
+    @Override
+    public void setUserVisibleHint(boolean visible) {
+        super.setUserVisibleHint(visible);
+        this.datasets = null;
     }
 
     protected void fillRootView() {
         rootView.findViewById(R.id.dataset_get_button).setOnClickListener(this);
-        rootView.findViewById(R.id.button_main_menu).setOnClickListener(this);
-        rootView.findViewById(R.id.checkBox_en).setOnClickListener(this);
-        rootView.findViewById(R.id.checkBox_de).setOnClickListener(this);
-        rootView.findViewById(R.id.checkBox_fr).setOnClickListener(this);
-        rootView.findViewById(R.id.checkBox_es).setOnClickListener(this);
+        rootView.findViewById(R.id.button_logout).setOnClickListener(this);
 
         activity = (MainActivity) getActivity();
 
-        TextView uidTextView = rootView.findViewById(R.id.device_uid_textview);
-        uidTextView.setText(activity.getUID());
+        if (activity.getUser() != null) {
+            TextView displayNameTextView = rootView.findViewById(R.id.display_name_textview);
+            displayNameTextView.setText(activity.getUser().getDisplayName());
+        }
 
         System.out.println("fill root view");
     }
@@ -61,29 +59,19 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.checkBox_en:
-            case R.id.checkBox_de:
-            case R.id.checkBox_es:
-            case R.id.checkBox_fr:
-                try {
-                    this.showDatasets(null);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
             case R.id.dataset_get_button:
                 ScrollView scrollView = rootView.findViewById(R.id.dataset_scrollview);
                 scrollView.removeAllViews();
                 try {
                     JSONObject message = new JSONObject();
-                    message.put("task", task);
                     message.put("mode", 5);
                     activity.comHandler.sendMessage(message);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 break;
-            case R.id.button_main_menu:
+            case R.id.button_logout:
+                activity.logout();
                 activity.setPagerItem(0);
                 break;
             default:
@@ -114,10 +102,6 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
         textView8.setText("Source");
         textView8.setTextSize(22);
 
-        TextView textView9 = new TextView(activity);
-        textView9.setText("Lang.");
-        textView9.setTextSize(22);
-
         TextView textView2 = new TextView(activity);
         textView2.setText("Annot. 1");
         textView2.setTextSize(22);
@@ -144,7 +128,6 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
 
         tableRow.addView(textView1);
         tableRow.addView(textView8);
-        tableRow.addView(textView9);
         tableRow.addView(textView2);
         tableRow.addView(textView3);
         tableRow.addView(textView4);
@@ -153,28 +136,10 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
         tableRow.addView(textView7);
         tableLayout.addView(tableRow);
 
-        Set<String> languages = new HashSet<>();
-        if (((CheckBox)rootView.findViewById(R.id.checkBox_en)).isChecked()) {
-            languages.add("en");
-        }
-        if (((CheckBox)rootView.findViewById(R.id.checkBox_de)).isChecked()) {
-            languages.add("de");
-        }
-        if (((CheckBox)rootView.findViewById(R.id.checkBox_fr)).isChecked()) {
-            languages.add("fr");
-        }
-        if (((CheckBox)rootView.findViewById(R.id.checkBox_es)).isChecked()) {
-            languages.add("es");
-        }
-
         for (int i = 0; i < datasets.length(); i++) {
             final JSONObject dataset = datasets.getJSONObject(i);
             final String datasetName = dataset.getString("name");
             String datasetSource = dataset.getString("dataset");
-            String language = dataset.getString("language");
-            if (!languages.contains(language)) {
-                continue;
-            }
 
             int annotations_1 = dataset.getInt("annotations_1");
             int annotations_2 = dataset.getInt("annotations_2");
@@ -191,15 +156,12 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onClick(View v) {
                     activity.comHandler.setDataset(dataset);
-                    activity.setPagerItem(overviewPagerItem);
+                    activity.setPagerItem(2);
                 }
             });
 
             TextView textViewRows7 = new TextView(activity);
             textViewRows7.setText(datasetSource);
-
-            TextView textViewRows8 = new TextView(activity);
-            textViewRows8.setText(language);
 
             TextView textViewRows1 = new TextView(activity);
             textViewRows1.setText(annotations_1 + "");
@@ -222,7 +184,6 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
             tableRow = new TableRow(activity);
             tableRow.addView(nameButton);
             tableRow.addView(textViewRows7);
-            tableRow.addView(textViewRows8);
             tableRow.addView(textViewRows1);
             tableRow.addView(textViewRows2);
             tableRow.addView(textViewRows3);

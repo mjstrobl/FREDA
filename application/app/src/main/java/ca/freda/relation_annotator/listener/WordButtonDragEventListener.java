@@ -6,7 +6,6 @@ import android.view.View;
 
 import ca.freda.relation_annotator.data.Entity;
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
-import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
 
 public class WordButtonDragEventListener implements View.OnDragListener {
 

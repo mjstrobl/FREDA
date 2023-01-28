@@ -4,7 +4,6 @@ import android.view.View;
 import android.widget.Button;
 
 import ca.freda.relation_annotator.fragment.AnnotationFragment;
-import ca.freda.relation_annotator.fragment.RE.REAnnotationFragment;
 
 public class EntityButtonOnClickListener implements View.OnClickListener {
 
