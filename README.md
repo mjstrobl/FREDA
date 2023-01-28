@@ -1,6 +1,6 @@
 # IMPORTANT
 
-This is still in progress and will change up until the conference end of March 2023.
+This is still in progress and will change up until the conference end of March 2023. See branch thesis for a working version. Unfortunately, the app is not yet available in the Play Store, will come soon though.
 
 # FREDA
 
