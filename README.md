@@ -21,7 +21,7 @@ We would like to thank all the data annotators for their hard work towards creat
 
 # Evaluation 
 
-Please see Michael Strobl's PhD thesis for an evaluation against the open-source system BRAT (https://brat.nlplab.org/). Here are links to the videos the evaluation is based on:
+Please see Michael Strobl's PhD thesis (link will be added once it's published) for an evaluation against the open-source system BRAT (https://brat.nlplab.org/). Here are links to the videos the evaluation is based on:
 
 BRAT RE: https://drive.google.com/file/d/1q5MKxxk5kSgVGn_VDt6Fif6HWHoMvkFL/view?usp=share_link
 
