@@ -1,8 +1,13 @@
+# IMPORTANT
+
+This is still in progress and will change up until the conference end of March 2023.
+
 # FREDA
 
 Fast Relation Extraction Data Annotation
 
-See our paper on Arxiv: https://arxiv.org/abs/2204.07150
+See our paper on Arxiv (accepted for the Knowledge and Natural Language Processing track at ACM SAC
+2023): https://arxiv.org/abs/2204.07150
 
 FREDA can be used to manually annotate sentences quickly and accurately. A simple procedure for sentence acquisition from a partially annotated Wikipedia-based corpus is provided to be able to create datasets for new relations.
 
