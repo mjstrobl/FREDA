@@ -246,7 +246,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 sampleObject.put("response", response);
                 sampleObject.put("datasetName", currentDatasetName);
                 sampleObject.put("datasetSource",currentDatasetSource);
-                sampleObject.put("uid", activity.getUser().getUid());
+                sampleObject.put("uid", activity.getUserId());
                 sampleObject.put("article", currentServerMessage.getString("article"));
                 sampleObject.put("line", currentServerMessage.getInt("line"));
                 fillEntities(sampleObject);

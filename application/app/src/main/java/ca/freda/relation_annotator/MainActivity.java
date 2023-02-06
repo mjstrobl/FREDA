@@ -1,8 +1,8 @@
 package ca.freda.relation_annotator;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
@@ -11,13 +11,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
+import com.amplifyframework.AmplifyException;
+import com.amplifyframework.auth.AuthUser;
+import com.amplifyframework.auth.AuthUserAttributeKey;
+import com.amplifyframework.core.Amplify;
+import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.UUID;
+import java.util.Objects;
 
 import ca.freda.relation_annotator.fragment.LoginFragment;
 import ca.freda.relation_annotator.handler.CommunicationHandler;
@@ -29,18 +31,22 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_PAGES = 3;
     public CommunicationHandler comHandler;
-    private FirebaseAuth mAuth;
     private CustomViewPager mPager;
     private ScreenSlidePagerAdapter pagerAdapter;
-    private FirebaseUser user;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_screen_slide);
 
-        mAuth = FirebaseAuth.getInstance();
+        try {
+            Amplify.addPlugin(new AWSCognitoAuthPlugin());
+            Amplify.configure(getApplicationContext());
+            Log.i("FREDA", "Initialized Amplify");
+        } catch (AmplifyException error) {
+            Log.e("FREDA", "Could not initialize Amplify", error);
+        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
@@ -55,17 +61,38 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            comHandler = new CommunicationHandler(this, currentUser);
-            System.out.println("Username: " + currentUser.getDisplayName());
+
+
+
+        Amplify.Auth.getCurrentUser(authUser -> {
+            setUserId(authUser.getUserId());
             setPagerItem(1);
-        }
+
+            Amplify.Auth.fetchUserAttributes(
+                    attributes -> {
+                        Log.i("AuthDemo", "User attributes = " + attributes.toString());
+                        for (int i =0; i < attributes.size(); i++) {
+                            if (attributes.get(i).getKey().getKeyString().equals("email")) {
+                                String email = attributes.get(i).getValue();
+                                pagerAdapter.overviewFragment.setEmail(email);
+                                break;
+                            }
+                        }
+                    },
+                    error -> Log.e("AuthDemo", "Failed to fetch user attributes.", error)
+            );
+        }, exception -> {
+            Log.e("FREDA", "User not signed in.", exception);
+        });
     }
 
     public void logout() {
-        mAuth.signOut();
+        Amplify.Auth.signOut( signOutResult -> {
+            Log.i("AuthQuickStart", "Signed out successfully");
+            runOnUiThread(() -> {
+                showToast("Signed out successfully!");
+            });
+        });
     }
 
     public void receiveMessage(JSONObject message) throws JSONException {
@@ -135,16 +162,12 @@ public class MainActivity extends AppCompatActivity {
         mPager.setCurrentItem(item);
     }
 
-    public FirebaseUser getUser() {
-        return this.user;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser(FirebaseUser user) {
-        this.user = user;
-    }
-
-    public FirebaseAuth getmAuth() {
-        return this.mAuth;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     /**

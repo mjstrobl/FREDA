@@ -45,15 +45,13 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
     protected void fillRootView() {
         rootView.findViewById(R.id.dataset_get_button).setOnClickListener(this);
         rootView.findViewById(R.id.button_logout).setOnClickListener(this);
-
         activity = (MainActivity) getActivity();
-
-        if (activity.getUser() != null) {
-            TextView displayNameTextView = rootView.findViewById(R.id.display_name_textview);
-            displayNameTextView.setText(activity.getUser().getDisplayName());
-        }
-
         System.out.println("fill root view");
+    }
+
+    public void setEmail(String email) {
+        TextView displayNameTextView = rootView.findViewById(R.id.display_name_textview);
+        displayNameTextView.setText(email);
     }
 
     @Override

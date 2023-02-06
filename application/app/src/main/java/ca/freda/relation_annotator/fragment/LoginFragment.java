@@ -1,31 +1,18 @@
 package ca.freda.relation_annotator.fragment;
 
-import android.graphics.Color;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
+import android.widget.EditText;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.concurrent.Executor;
+import com.amplifyframework.auth.result.step.AuthSignInStep;
+import com.amplifyframework.core.Amplify;
 
 import ca.freda.relation_annotator.MainActivity;
 import ca.freda.relation_annotator.R;
@@ -51,47 +38,95 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     protected void fillRootView() {
         activity = (MainActivity) getActivity();
         rootView.findViewById(R.id.button_login).setOnClickListener(this);
-        //rootView.findViewById(R.id.button_create_account).setOnClickListener(this);
         System.out.println("fill root view");
     }
 
+    private void showPasswordMessage(String password) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("Reset Password");
+        builder.setMessage("You need to reset your password since this is your first sign in.");
 
-    /*private void createAccount(String email, String password) {
-        System.out.println("create account");
-        FirebaseAuth mAuth = activity.getmAuth();
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            activity.setUser(user);
-                            activity.setPagerItem(1);
-                        } else {
-                            activity.showToast("Authentication failed!");
+        // Set up the input
+        final EditText input = new EditText(activity);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newPassword = input.getText().toString();
+                Amplify.Auth.confirmSignIn(newPassword,
+                        result -> {
+                            Log.i("AuthQuickstart", "Updated password successfully");
+                            activity.runOnUiThread(() -> {
+                                activity.showToast("Updated password successfully!");
+                            });
+                            if (result.isSignedIn()) {
+                                singedIn();
+                            }
+                        },
+                        error -> {
+                            Log.e("AuthQuickstart", error.toString());
+                            activity.runOnUiThread(() -> {
+                                activity.showToast("Update password failed! Please message admin or use a longer password!");
+                            });
                         }
-                    }
-                });
-    }*/
+                );
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void singedIn() {
+        Amplify.Auth.getCurrentUser(authUser -> {
+            activity.setUserId(authUser.getUserId());
+            activity.setPagerItem(1);
+        }, exception -> {
+            Log.e("FREDA", "Error getting current user", exception);
+            activity.runOnUiThread(() -> {
+                activity.showToast("Something went wrong, sign in failed!");
+            });
+        });
+    }
 
     private void signIn(String email, String password) {
-        System.out.println("sign in");
-        FirebaseAuth mAuth = activity.getmAuth();
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            activity.setUser(user);
-                            activity.setPagerItem(1);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            activity.showToast("Authentication failed!");
-                        }
+        System.out.println("sign in: " + email);
+
+        Amplify.Auth.signIn(
+                email,
+                password,
+                result -> {
+                    if (result.isSignedIn()) {
+                        singedIn();
+                    } else if (result.getNextStep().getSignInStep() == AuthSignInStep.CONFIRM_SIGN_IN_WITH_NEW_PASSWORD) {
+                        System.out.println("CONFIRM_SIGN_IN_WITH_NEW_PASSWORD");
+                        activity.runOnUiThread(() -> {
+                            showPasswordMessage(password);
+                        });
+
+                    } else {
+                        System.out.println(result);
+                        Log.i("AuthQuickstart", result.isSignedIn() ? "Sign in succeeded" : "Sign in not complete");
                     }
-                });
+                },
+                error -> {
+                    activity.runOnUiThread(() -> {
+                        activity.showToast("Authentication failed!");
+                    });
+                    Log.e("AuthQuickstart", error.toString());
+                }
+        );
     }
+
 
     @Override
     public void onClick(View view) {
@@ -106,9 +141,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
 
         switch (view.getId()) {
-            /*case R.id.button_create_account:
-                createAccount(email, password);
-                break;*/
             case R.id.button_login:
                 signIn(email, password);
                 break;

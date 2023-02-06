@@ -17,14 +17,4 @@ public class Utils {
         }
         return false;
     }
-
-    public static Set jsonArrayToSet(JSONArray array) throws JSONException {
-        Set<Object> result = new HashSet<>();
-
-        for (int i = 0; i < array.length(); i++) {
-            result.add(array.getInt(i));
-        }
-
-        return result;
-    }
 }

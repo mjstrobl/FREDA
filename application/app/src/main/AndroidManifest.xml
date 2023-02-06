@@ -14,7 +14,10 @@
         <activity android:name=".MainActivity" android:screenOrientation="sensorLandscape" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="freda" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

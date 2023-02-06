@@ -36,11 +36,6 @@ public class EntityScrollviewDragEventListener implements View.OnDragListener {
                 return true;
 
             case DragEvent.ACTION_DRAG_LOCATION:
-                //System.out.println("Scrollview ACTION_DRAG_LOCATION");
-                //System.out.println(event);
-
-                //mainActivity.scrollEntityScrollView(event.getX(),scrollView);
-
                 return true;
 
             case DragEvent.ACTION_DRAG_EXITED:
