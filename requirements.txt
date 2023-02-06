@@ -1,5 +1,0 @@
-sqlite3
-glob
-json
-jaydebeapi
-stanza
