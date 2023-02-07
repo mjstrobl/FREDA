@@ -76,7 +76,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="86dp"
                 android:orientation="horizontal">
 
                 <Button
@@ -86,7 +86,27 @@
                     android:layout_weight="1"
                     android:text="Login" />
 
+                <Button
+                    android:id="@+id/button_reset_req"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Request PWD Request" />
+
+                <Button
+                    android:id="@+id/button_reset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Reset Pwd" />
+
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView_info"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:text="@string/pwd_info_textview" />
         </LinearLayout>
 
     </LinearLayout>

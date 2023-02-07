@@ -3,4 +3,5 @@
     <string name="ignore">Ignore</string>
     <string name="remove">Remove</string>
     <string name="main">Main</string>
+    <string name="pwd_info_textview">After the first login, FREDA will ask for a new password. The minium requirement is 8 characters.</string>
 </resources>

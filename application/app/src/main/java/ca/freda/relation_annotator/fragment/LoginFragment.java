@@ -38,13 +38,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     protected void fillRootView() {
         activity = (MainActivity) getActivity();
         rootView.findViewById(R.id.button_login).setOnClickListener(this);
+        rootView.findViewById(R.id.button_reset_req).setOnClickListener(this);
+        rootView.findViewById(R.id.button_reset).setOnClickListener(this);
         System.out.println("fill root view");
     }
 
-    private void showPasswordMessage(String password) {
+    private void showPasswordMessage() {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Reset Password");
-        builder.setMessage("You need to reset your password since this is your first sign in.");
+        builder.setMessage("You need to reset your password since this is your first sign in. Minimum requirement is 8 characters.");
 
         // Set up the input
         final EditText input = new EditText(activity);
@@ -86,6 +88,52 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         builder.show();
     }
 
+    private void showPasswordResetMessage(String email, String password) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("Reset Password");
+        builder.setMessage("Please provide the activation code to reset the password. Minimum requirement for new password is 8 characters.");
+
+        // Set up the input
+        final EditText input = new EditText(activity);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String activationCode = input.getText().toString();
+
+                Amplify.Auth.confirmResetPassword(
+                        email,
+                        password,
+                        activationCode,
+                        () -> {
+                            Log.i("AuthQuickstart", "New password confirmed");
+                            activity.runOnUiThread(() -> {
+                                activity.showToast("Reset password successfully!");
+                            });
+                        },
+                        error -> {
+                            Log.e("AuthQuickstart", error.toString());
+                            activity.runOnUiThread(() -> {
+                                activity.showToast("Reset password failed!");
+                            });
+                        }
+                );
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
     private void singedIn() {
         Amplify.Auth.getCurrentUser(authUser -> {
             activity.setUserId(authUser.getUserId());
@@ -101,6 +149,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private void signIn(String email, String password) {
         System.out.println("sign in: " + email);
 
+        if (email.length() == 0 || password.length() == 0) {
+            activity.showToast("Email and password cannot be empty!");
+            return;
+        }
+
         Amplify.Auth.signIn(
                 email,
                 password,
@@ -110,7 +163,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     } else if (result.getNextStep().getSignInStep() == AuthSignInStep.CONFIRM_SIGN_IN_WITH_NEW_PASSWORD) {
                         System.out.println("CONFIRM_SIGN_IN_WITH_NEW_PASSWORD");
                         activity.runOnUiThread(() -> {
-                            showPasswordMessage(password);
+                            showPasswordMessage();
                         });
 
                     } else {
@@ -127,6 +180,37 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         );
     }
 
+    private void requestPwdReset(String email) {
+        if (email.length() == 0) {
+            activity.showToast("Email cannot be empty!");
+            return;
+        }
+
+        Amplify.Auth.resetPassword(
+                email,
+                result -> {
+                    Log.i("AuthQuickstart", result.toString());
+                    activity.runOnUiThread(() -> {
+                        activity.showToast("We emailed you a verification code. You can use it to reset your password.");
+                    });
+                },
+                error -> {
+                    Log.e("AuthQuickstart", error.toString());
+                    activity.runOnUiThread(() -> {
+                        activity.showToast("Password reset failed!");
+                    });
+                }
+        );
+    }
+
+    private void resetPwd(String email, String password) {
+        if (email.length() == 0 || password.length() == 0) {
+            activity.showToast("Email and password cannot be empty!");
+            return;
+        }
+
+        showPasswordResetMessage(email, password);
+    }
 
     @Override
     public void onClick(View view) {
@@ -135,14 +219,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         TextView passwordTextView = (TextView) rootView.findViewById(R.id.password);
         String password = passwordTextView.getText().toString();
 
-        if (email.length() == 0 || password.length() == 0) {
-            activity.showToast("Email and password cannot be empty!");
-            return;
-        }
-
         switch (view.getId()) {
             case R.id.button_login:
                 signIn(email, password);
+                break;
+            case R.id.button_reset_req:
+                requestPwdReset(email);
+                break;
+            case R.id.button_reset:
+                resetPwd(email, password);
                 break;
             default:
                 break;
