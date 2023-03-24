@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/dataset_name_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="FREDA Login"
@@ -76,37 +76,66 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="86dp"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/button_login"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Login" />
+                    android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/button_reset_req"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Request PWD Request" />
+                    <Button
+                        android:id="@+id/button_login"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Login" />
 
-                <Button
-                    android:id="@+id/button_reset"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Reset Pwd" />
+                    <Button
+                        android:id="@+id/button_reset_req"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Request PWD Reset" />
+
+                    <Button
+                        android:id="@+id/button_update"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Update Pwd" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="51dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/button_logout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Logout" />
+
+                    <Button
+                        android:id="@+id/button_datasets"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Show Datasets" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textView_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="195dp"
+                    android:layout_weight="1" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView_info"
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:text="@string/pwd_info_textview" />
         </LinearLayout>
 
     </LinearLayout>

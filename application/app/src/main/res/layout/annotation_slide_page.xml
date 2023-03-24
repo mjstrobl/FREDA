@@ -38,34 +38,13 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/linearLayout4"
+                    <TextView
+                        android:id="@+id/dataset_textview"
                         android:layout_width="match_parent"
-                        android:layout_height="25dp">
-
-                        <TextView
-                            android:id="@+id/uid_textview"
-                            android:layout_width="200dp"
-                            android:layout_height="match_parent"
-                            android:singleLine="true"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/dataset_textview"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/dataset_textview"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:textAlignment="center"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/uid_textview"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:layout_height="20dp"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textStyle="bold" />
 
                     <View
                         android:id="@+id/view"
@@ -131,10 +110,10 @@
                         app:srcCompat="@android:drawable/stat_notify_sync" />
 
                     <Button
-                        android:id="@+id/main_button_annotation"
+                        android:id="@+id/back_button_annotation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/main"
+                        android:text="@string/back"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/previous_button" />
@@ -148,7 +127,7 @@
                         android:longClickable="false"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/main_button_annotation"
+                        app:layout_constraintTop_toBottomOf="@+id/back_button_annotation"
                         app:srcCompat="@android:drawable/ic_menu_delete" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -210,24 +189,13 @@
                 android:background="#918C8C"
                 android:backgroundTint="#918C8C"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/annotation_remove_button"
+                app:layout_constraintEnd_toStartOf="@+id/annotation_ignore_button"
                 app:layout_constraintStart_toEndOf="@+id/response_scrollview" />
-
-            <View
-                android:id="@+id/view3"
-                android:layout_width="1dp"
-                android:layout_height="45dp"
-                android:background="#918C8C"
-                android:backgroundTint="#918C8C"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/response_scrollview"
-                app:layout_constraintStart_toEndOf="@+id/annotation_ignore_button" />
 
             <HorizontalScrollView
                 android:id="@+id/response_scrollview"
                 android:layout_width="0dp"
                 android:layout_height="45dp"
-                android:layout_marginStart="90dp"
                 android:layout_marginEnd="90dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -238,22 +206,14 @@
             </HorizontalScrollView>
 
             <Button
-                android:id="@+id/annotation_remove_button"
+                android:id="@+id/annotation_ignore_button"
                 android:layout_width="88dp"
                 android:layout_height="45dp"
                 android:backgroundTint="#FF0000"
                 android:shadowColor="#FFFFFF"
-                android:text="@string/remove"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <Button
-                android:id="@+id/annotation_ignore_button"
-                android:layout_width="88dp"
-                android:layout_height="45dp"
                 android:text="@string/ignore"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

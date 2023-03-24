@@ -19,7 +19,6 @@ public class WordButtonDragEventListener implements View.OnDragListener {
 
     public boolean onDrag(View v, DragEvent event) {
 
-        //System.out.println(event);
         final int action = event.getAction();
         switch(action) {
 
@@ -57,21 +56,12 @@ public class WordButtonDragEventListener implements View.OnDragListener {
                 annotationFragment.addEntity(wordViewId,entity);
 
 
-                annotationFragment.reloadViews(true);
+                annotationFragment.reloadViews();
                 v.invalidate();
                 return true;
             }
             case DragEvent.ACTION_DRAG_ENDED: {
 
-
-                /*String text = (String)v.getTag();
-                System.out.println("ACTION_DRAG_ENDED: " + text);
-                String[] tokens = text.split("_");
-                System.out.println("Item text: " + text);
-                int tag = Integer.parseInt(tokens[tokens.length-1]);
-
-                mainActivity.wordButtonDragEnded(text);
-                System.out.println("text: " + text);*/
                 v.invalidate();
                 return true;
             }

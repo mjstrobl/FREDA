@@ -2,7 +2,6 @@ package ca.freda.relation_annotator.fragment;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Message;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -21,6 +20,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+
+import com.amazonaws.http.HttpMethodName;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,22 +50,22 @@ import ca.freda.relation_annotator.listener.EntityViewLongClickListener;
 import ca.freda.relation_annotator.listener.GarbageViewDragEventListener;
 import ca.freda.relation_annotator.listener.WordButtonDragEventListener;
 import ca.freda.relation_annotator.listener.WordButtonOnTouchListener;
-import ca.freda.relation_annotator.util.Utils;
 
 
 public class AnnotationFragment extends Fragment implements View.OnClickListener {
 
     protected JSONObject currentServerMessage;
-
-    protected String currentDatasetInfo;
-    protected String currentDatasetName;
-    protected String currentDatasetSource;
     protected MainActivity activity;
-
     List<Map<String, Object>> allPositions;
     protected List<Button> responseButtons;
-
     protected ViewGroup rootView;
+    protected String relation;
+    protected String dataset;
+    protected String info;
+    protected int sentenceId;
+    protected int annotator;
+    protected Map<String, String> backParams;
+    protected JSONArray responses;
     protected Data data;
     protected LinearLayout linearHorizontalScrollviewLayout;
     //private String[] htmlColours = {"#009900","#0099ff","#ff5050","#9933ff","#ff8b33","#7e33ff","#260505","#220b80","#4bde7b","#65c900","#800046","#a65c46","#c0d40d"};
@@ -78,6 +79,8 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         rootView = (ViewGroup) inflater.inflate(R.layout.annotation_slide_page, container, false);
         fillRootView();
+        removeAllData();
+
         return rootView;
     }
 
@@ -85,15 +88,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
         if (visible) {
-            try {
-                currentDatasetName = activity.comHandler.getDataset().getString("name");
-                if (activity.comHandler.getDataset().has("info_short")) {
-                    currentDatasetInfo = activity.comHandler.getDataset().getString("info_short");
-                } else {
-                    currentDatasetInfo = currentDatasetName;
-                }
-                System.out.println(activity.comHandler.getDataset());
-                currentDatasetSource = activity.comHandler.getDataset().getString("dataset");
                 HorizontalScrollView scrollView = rootView.findViewById(R.id.response_scrollview);
                 scrollView.removeAllViews();
 
@@ -123,7 +117,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            setTextViewText("Waiting for data, could take around 30 seconds.");
                             sendSampleResponse((int)v.getTag());
                         }
                     });
@@ -136,19 +129,60 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
                 switchButtonState(false);
 
 
-                JSONObject message = new JSONObject();
-                message.put("mode", 1);
-                message.put("datasetName", currentDatasetName);
-                message.put("datasetSource",currentDatasetSource);
-                activity.comHandler.sendMessage(message);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (NullPointerException ex) {
-                ex.printStackTrace();
-            }
-
             System.out.println("Annotation Fragment visible.");
         }
+    }
+
+    public void getSentence() {
+        removeAllData();
+        Map<String, String> params = new HashMap<String, String>() {{
+            put("dataset", dataset);
+            put("relation", relation);
+            put("uid",activity.getUser().getUserId());
+        }};
+        activity.getGatewayHandler().doInvokeAPI(HttpMethodName.GET, "sentence", params, null);
+    }
+
+    public void showSentence(JSONObject response) throws JSONException {
+        usedColours = new HashSet<>();
+        currentServerMessage = response;
+        System.out.println(response);
+
+        if (!response.has("text")) {
+            activity.showToast("Ran out of sentences to annotate! You could try another dataset.");
+            return;
+        }
+
+        String text = response.getString("text");
+        JSONArray entities = response.getJSONArray("entities");
+        sentenceId = response.getInt("id");
+        annotator = response.getInt("annotator");
+        responses = response.getJSONArray("responses");
+
+        data = new Data(text);
+        for(int i = 0; i < entities.length(); i++) {
+            JSONArray positionsJson = entities.getJSONArray(i);
+
+            EntityButtonProperty property = EntityButtonProperty.NONE;
+
+            List<Position> positions = new ArrayList<>(positionsJson.length());
+            for (int j = 0; j < positionsJson.length(); j++) {
+                JSONObject currentPosition = positionsJson.getJSONObject(j);
+                int start = currentPosition.getInt("start");
+                int length = currentPosition.getInt("length");
+                positions.add(new Position(start, length));
+            }
+
+            if (positions.size() > 0) {
+                int colour = getNewEntityColour();
+                data.addEntity(colour, property, positions);
+                usedColours.add(colour);
+            }
+        }
+
+        reloadViews();
+        switchButtonState(true);
+        setDatasetTextviewText();
     }
 
     protected void fillRootView() {
@@ -166,10 +200,9 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
         trashButton.setOnDragListener(garbageViewDragEventListener);
 
         rootView.findViewById(R.id.previous_button).setOnClickListener(this);
-        rootView.findViewById(R.id.annotation_remove_button).setOnClickListener(this);
         rootView.findViewById(R.id.annotation_ignore_button).setOnClickListener(this);
         rootView.findViewById(R.id.reload_button).setOnClickListener(this);
-        rootView.findViewById(R.id.main_button_annotation).setOnClickListener(this);
+        rootView.findViewById(R.id.back_button_annotation).setOnClickListener(this);
 
         System.out.println("on create annotation fragment.");
     }
@@ -178,44 +211,32 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         System.out.println("onclick");
         switch (view.getId()) {
-            case R.id.previous_button:
-                switchButtonState(false);
-                try {
-                    JSONObject message = new JSONObject();
-                    message.put("mode", 4);
-                    message.put("datasetName", currentDatasetName);
-                    message.put("datasetSource",currentDatasetSource);
-                    activity.comHandler.sendMessage(message);
-                    message.put("mode", 1);
-                    activity.comHandler.sendMessage(message);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            case R.id.previous_button: {
+                if (backParams == null) {
+                    activity.showToast("No previous annotation available!");
+                } else {
+                    removeAllData();
+                    switchButtonState(false);
+                    activity.getGatewayHandler().doInvokeAPI(HttpMethodName.PUT, "back", backParams, null);
                 }
-
-                break;
+            }
             case R.id.reload_button:
                 if (currentServerMessage == null) {
+                    activity.showToast("Error: No data available.");
+                } else {
                     try {
-                        JSONObject message = new JSONObject();
-                        message.put("datasetName", currentDatasetName);
-                        message.put("datasetSource",currentDatasetSource);
-                        message.put("mode", 1);
-                        activity.comHandler.sendMessage(message);
+                        showSentence(currentServerMessage);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                } else {
-                    createData(currentServerMessage);
                 }
                 break;
-            case R.id.main_button_annotation:
-                activity.setPagerItem(1);
+            case R.id.back_button_annotation:
+                activity.setPagerItem(2);
+                backParams = null;
                 break;
             case R.id.annotation_ignore_button:
                 sendSampleResponse(-1);
-                break;
-            case R.id.annotation_remove_button:
-                sendSampleResponse(-2);
                 break;
             default:
                 break;
@@ -224,9 +245,8 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
 
     protected void switchButtonState(boolean enabled) {
         if (responseButtons != null) {
-            rootView.findViewById(R.id.annotation_remove_button).setEnabled(enabled);
             rootView.findViewById(R.id.annotation_ignore_button).setEnabled(enabled);
-            rootView.findViewById(R.id.main_button_annotation).setEnabled(enabled);
+            //rootView.findViewById(R.id.back_button_annotation).setEnabled(enabled);
             rootView.findViewById(R.id.reload_button).setEnabled(enabled);
             rootView.findViewById(R.id.previous_button).setEnabled(enabled);
             for (Button button : responseButtons) {
@@ -237,129 +257,112 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
 
     private void sendSampleResponse(int response) {
         switchButtonState(false);
-        Message msg = activity.comHandler.obtainMessage();
 
         try {
-            if (msg != null) {
-                JSONObject sampleObject = new JSONObject();
-                sampleObject.put("mode", 2);
-                sampleObject.put("response", response);
-                sampleObject.put("datasetName", currentDatasetName);
-                sampleObject.put("datasetSource",currentDatasetSource);
-                sampleObject.put("uid", activity.getUserId());
-                sampleObject.put("article", currentServerMessage.getString("article"));
-                sampleObject.put("line", currentServerMessage.getInt("line"));
-                fillEntities(sampleObject);
-                msg.obj = sampleObject.toString();
-                System.out.println(msg.obj);
-                activity.comHandler.sendMessage(msg);
+            JSONObject responseObject = new JSONObject();
+            boolean entitiesFound = fillEntities(responseObject);
+
+            if (!entitiesFound && response == 1) {
+                activity.showToast("For yes responses, you must set subject AND object!");
+                switchButtonState(true);
+                return;
             }
-            System.out.println("Ask for new sample.");
-            JSONObject message = new JSONObject();
-            message.put("mode", 1);
-            message.put("datasetName", currentDatasetName);
-            message.put("datasetSource",currentDatasetSource);
-            activity.comHandler.sendMessage(message);
-        } catch (JSONException ex) {
-            ex.printStackTrace();
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
+
+            removeAllData();
+
+            int once = 0;
+            int twice = 0;
+            int full = 0;
+
+            if (response >= 0) {
+                if (responses.length() == 0) {
+                    once += 1;
+                } else if (responses.length() == 1) {
+                    twice += 1;
+                    if (responses.getInt(0) == response) {
+                        full += 1;
+                    }
+                } else if (responses.length() == 2) {
+                    full += 1;
+                }
+            }
+
+            int finalOnce = once;
+            int finalTwice = twice;
+            int finalFull = full;
+
+            backParams = new HashMap<String, String>() {{
+                put("dataset", dataset);
+                put("relation", relation);
+                put("annotator", annotator + "");
+                put("uid",activity.getUser().getUserId());
+                put("id","" + sentenceId);
+                put("response",response + "");
+                put("response_once", finalOnce + "");
+                put("response_twice", finalTwice + "");
+                put("response_full", finalFull + "");
+            }};
+
+            activity.getGatewayHandler().doInvokeAPI(HttpMethodName.POST, "response", backParams, responseObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
-    protected void fillEntities(JSONObject sampleObject) throws JSONException {
+    protected boolean fillEntities(JSONObject sampleObject) throws JSONException {
         JSONArray entities = new JSONArray();
         JSONArray subjects = new JSONArray();
         JSONArray objects = new JSONArray();
+        boolean subjectFound = false;
+        boolean objectFound = false;
         for (int i = 0; i < data.getNumEntities(); i++) {
             Entity entity = data.getEntity(i);
             fillEntity(entity, entities);
-
             if (entity.getProperty() == EntityButtonProperty.SUBJECT) {
                 subjects.put(i);
+                subjectFound = true;
             } else if (entity.getProperty() == EntityButtonProperty.OBJECT) {
                 objects.put(i);
+                objectFound = true;
             }
         }
         sampleObject.put("subjects",subjects);
         sampleObject.put("objects",objects);
+        sampleObject.put("entities",entities);
 
-        JSONObject entityAnnotations = new JSONObject();
-        entityAnnotations.put("entities",entities);
-
-        sampleObject.put("entities",entityAnnotations);
+        return subjectFound && objectFound;
     }
 
     protected void fillEntity(Entity entity, JSONArray entities) throws JSONException {
         JSONArray positionsJSON = new JSONArray();
         // we can assume that all of these entities have at least one position.
         for (Position position : entity.getPositions()) {
-            JSONArray positionJSON = new JSONArray();
-            positionJSON.put(position.start);
-            positionJSON.put(position.length);
+            JSONObject positionJSON = new JSONObject();
+            positionJSON.put("start", position.start);
+            positionJSON.put("length", position.length);
             positionsJSON.put(positionJSON);
         }
 
-        JSONObject entityJSON = new JSONObject();
-        entityJSON.put("name", entity.getName());
-        entityJSON.put("positions",positionsJSON);
-        entities.put(entityJSON);
+        entities.put(positionsJSON);
     }
 
-    public void createData(JSONObject message) {
-        currentServerMessage = message;
-        HorizontalScrollView scrollView = rootView.findViewById(R.id.entity_scrollview);
-        scrollView.scrollTo(0, 0);
-
-        try {
-            // {"sentence": "In 2004, Kayla married David E. Tolbert.", "entity_subject": [[9, 5]], "entity_object": [[23, 16]], "id": 1, "mode": 1}
-            usedColours = new HashSet<>();
-            String sentence = currentServerMessage.getString("sentence");
-
-            data = new Data(sentence);
-            JSONArray annotations = currentServerMessage.getJSONObject("entities").getJSONArray("entities");
-
-            int annotator = currentServerMessage.getInt("annotator");
-            setDatasetTextviewText(annotator);
-
-            for(int i = 0; i < annotations.length(); i++) {
-                JSONObject annotation = annotations.getJSONObject(i);
-
-                JSONArray positionsJSON = annotation.getJSONArray("positions");
-                EntityButtonProperty property = EntityButtonProperty.NONE;
-
-                List<Position> positions = new ArrayList<>(positionsJSON.length());
-                for (int j = 0; j < positionsJSON.length(); j++) {
-                    JSONArray currentPosition = positionsJSON.getJSONArray(j);
-                    int start = currentPosition.getInt(0);
-                    int length = currentPosition.getInt(1);
-                    positions.add(new Position(start, length));
-                }
-
-                if (positions.size() > 0) {
-                    int colour = getNewEntityColour();
-                    data.addEntity(colour, property, positions);
-                    usedColours.add(colour);
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        reloadViews(true);
-        switchButtonState(true);
-    }
-
-    protected void setDatasetTextviewText(int annotator) {
+    protected void setDatasetTextviewText() {
         TextView datasetTextView = rootView.findViewById(R.id.dataset_textview);
-        datasetTextView.setText("Annotator: " + annotator + ", Relation: " + currentDatasetInfo);
+        datasetTextView.setText("Dataset: " + dataset + ", Relation: " + relation + " (" + info + "), Annotator: " + annotator);
+    }
+
+    protected void setDatasetInfo(String dataset, String relation, String info, int annotator) {
+        this.relation = relation;
+        this.dataset = dataset;
+        this.info = info;
+        this.annotator = annotator;
     }
 
     public void fillTextView(boolean restart) {
         System.out.println("fillTextView");
 
         if (data == null) {
-            setTextViewText("Waiting for data, could take around 30 seconds.");
+            removeAllData();
             return;
         }
 
@@ -368,7 +371,6 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             allPositions = new ArrayList<>();
             for (int i = 0; i < data.getNumEntities(); i++) {
                 Entity entity = data.getEntity(i);
-                entity.setTextviewTextPositions(new ArrayList<>());
                 for (Position position : entity.getPositions()) {
                     int start = position.start;
                     int length = position.length;
@@ -510,6 +512,16 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
         //fillWordButtonView();
     }
 
+    private void removeAllData() {
+        setTextViewText("Waiting for data, could take around 30 seconds.");
+
+        HorizontalScrollView horizontalScrollView = rootView.findViewById(R.id.entity_scrollview);
+        horizontalScrollView.removeAllViews();
+
+        ScrollView scrollView = rootView.findViewById(R.id.word_scrollview);
+        scrollView.removeAllViews();
+    }
+
     public void fillEntityButtonScrollView() {
         HorizontalScrollView scrollView = rootView.findViewById(R.id.entity_scrollview);
         scrollView.removeAllViews();
@@ -567,6 +579,10 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             button.setPaintFlags(button.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             button.setTypeface(null, Typeface.BOLD);
             button.setText(String.format("%s (obj)", entity.getName()));
+        } else {
+            button.setText(entity.getName());
+            button.setTypeface(null, Typeface.NORMAL);
+            button.setPaintFlags(button.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
         }
     }
 
@@ -650,11 +666,9 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    public void reloadViews(boolean reloadData) {
-        //if (data != null && reloadData) {
-            data.createAnnotations();
-            data.createWords();
-        //}
+    public void reloadViews() {
+        data.createAnnotations();
+        data.createWords();
         fillEntityButtonScrollView();
         fillTextView(true);
         fillWordButtonView();
@@ -713,7 +727,7 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
             data.cleanUpEntities();
         }
         //TODO: It may not be necessary to reload everything. But it looks like sentence, entity and word view need to be reloaded.
-        reloadViews(false);
+        reloadViews();
     }
 
     private void setTextViewText(String text) {
@@ -726,13 +740,10 @@ public class AnnotationFragment extends Fragment implements View.OnClickListener
         data.removeEntity(index);
         System.out.println("createAnnotations");
         data.createAnnotations();
-        //System.out.println("createWords");
-        //data.createWords();
-
-        reloadViews(false);
+        reloadViews();
     }
 
-    public Data getData() {
-        return data;
+    public void setBackParams(Map<String, String> backParams) {
+        this.backParams = backParams;
     }
 }

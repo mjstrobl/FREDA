@@ -14,9 +14,14 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.amazonaws.http.HttpMethodName;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 import ca.freda.relation_annotator.MainActivity;
 import ca.freda.relation_annotator.R;
@@ -25,8 +30,6 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
 
     protected ViewGroup rootView;
     private MainActivity activity;
-    private JSONArray datasets;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,40 +39,20 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-    @Override
-    public void setUserVisibleHint(boolean visible) {
-        super.setUserVisibleHint(visible);
-        this.datasets = null;
-    }
-
     protected void fillRootView() {
-        rootView.findViewById(R.id.dataset_get_button).setOnClickListener(this);
-        rootView.findViewById(R.id.button_logout).setOnClickListener(this);
+        rootView.findViewById(R.id.relations_get_button).setOnClickListener(this);
+        rootView.findViewById(R.id.button_back).setOnClickListener(this);
         activity = (MainActivity) getActivity();
         System.out.println("fill root view");
-    }
-
-    public void setEmail(String email) {
-        TextView displayNameTextView = rootView.findViewById(R.id.display_name_textview);
-        displayNameTextView.setText(email);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.dataset_get_button:
-                ScrollView scrollView = rootView.findViewById(R.id.dataset_scrollview);
-                scrollView.removeAllViews();
-                try {
-                    JSONObject message = new JSONObject();
-                    message.put("mode", 5);
-                    activity.comHandler.sendMessage(message);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            case R.id.relations_get_button:
+                activity.getGatewayHandler().doInvokeAPI(HttpMethodName.GET, "dataset", new HashMap<>(), null);
                 break;
-            case R.id.button_logout:
-                activity.logout();
+            case R.id.button_back:
                 activity.setPagerItem(0);
                 break;
             default:
@@ -77,12 +60,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void showDatasets(JSONArray datasets)throws JSONException {
-        if (datasets == null) {
-            datasets = this.datasets;
-        } else {
-            this.datasets = datasets;
-        }
+    public void showDatasets(JSONObject datasets) throws JSONException {
         System.out.println(datasets);
         TableLayout tableLayout = new TableLayout(activity);
         tableLayout.setOrientation(LinearLayout.VERTICAL);
@@ -93,102 +71,79 @@ public class OverviewFragment extends Fragment implements View.OnClickListener {
         TableRow tableRow = new TableRow(activity);
         tableRow.setBackgroundColor(Color.LTGRAY);
         TextView textView1 = new TextView(activity);
-        textView1.setText("Relation");
+        textView1.setText("Dataset");
         textView1.setTextSize(22);
 
         TextView textView8 = new TextView(activity);
-        textView8.setText("Source");
+        textView8.setText("Relations");
         textView8.setTextSize(22);
 
         TextView textView2 = new TextView(activity);
-        textView2.setText("Annot. 1");
+        textView2.setText("Active");
         textView2.setTextSize(22);
 
         TextView textView3 = new TextView(activity);
-        textView3.setText("Annot. 2");
+        textView3.setText("Annotations");
         textView3.setTextSize(22);
 
         TextView textView4 = new TextView(activity);
-        textView4.setText("Annot. 3");
+        textView4.setText("Sentences");
         textView4.setTextSize(22);
 
-        TextView textView5 = new TextView(activity);
-        textView5.setText("Once");
-        textView5.setTextSize(22);
-
-        TextView textView6 = new TextView(activity);
-        textView6.setText("Twice");
-        textView6.setTextSize(22);
-
-        TextView textView7 = new TextView(activity);
-        textView7.setText("Full");
-        textView7.setTextSize(22);
 
         tableRow.addView(textView1);
         tableRow.addView(textView8);
         tableRow.addView(textView2);
         tableRow.addView(textView3);
         tableRow.addView(textView4);
-        tableRow.addView(textView5);
-        tableRow.addView(textView6);
-        tableRow.addView(textView7);
         tableLayout.addView(tableRow);
 
-        for (int i = 0; i < datasets.length(); i++) {
-            final JSONObject dataset = datasets.getJSONObject(i);
-            final String datasetName = dataset.getString("name");
-            String datasetSource = dataset.getString("dataset");
+        Iterator<String> keys = datasets.keys();
 
-            int annotations_1 = dataset.getInt("annotations_1");
-            int annotations_2 = dataset.getInt("annotations_2");
-            int annotations_3 = dataset.getInt("annotations_3");
-            int annotations_once = dataset.getInt("once");
-            int annotations_twice = dataset.getInt("twice");
-            int annotations_full = dataset.getInt("full");
-            System.out.println(dataset);
+        while(keys.hasNext()) {
+            String key = keys.next();
+            if (datasets.get(key) instanceof JSONObject) {
+                JSONArray relations = datasets.getJSONObject(key).getJSONArray("relations");
+                boolean active = datasets.getJSONObject(key).getBoolean("active");
+                int sentences = datasets.getJSONObject(key).getInt("sentences");
+                int annotations = datasets.getJSONObject(key).getInt("annotations");
+                String datasetName = key;
 
-            Button nameButton = new Button(activity);
-            nameButton.setText(datasetName);
-            nameButton.setTag(datasetName);
-            nameButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.comHandler.setDataset(dataset);
-                    activity.setPagerItem(2);
-                }
-            });
+                Button nameButton = new Button(activity);
+                nameButton.setText(datasetName);
+                nameButton.setTag(datasetName);
+                nameButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            activity.getPagerAdapter().getDatasetFragment().showRelations(relations, datasetName, active);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        activity.setPagerItem(2);
+                    }
+                });
 
-            TextView textViewRows7 = new TextView(activity);
-            textViewRows7.setText(datasetSource);
+                TextView textViewRows1 = new TextView(activity);
+                textViewRows1.setText(relations.length() + "");
 
-            TextView textViewRows1 = new TextView(activity);
-            textViewRows1.setText(annotations_1 + "");
+                TextView textViewRows2 = new TextView(activity);
+                textViewRows2.setText(active + "");
 
-            TextView textViewRows2 = new TextView(activity);
-            textViewRows2.setText(annotations_2 + "");
+                TextView textViewRows3 = new TextView(activity);
+                textViewRows3.setText(annotations + "");
 
-            TextView textViewRows3 = new TextView(activity);
-            textViewRows3.setText(annotations_3 + "");
+                TextView textViewRows4 = new TextView(activity);
+                textViewRows4.setText(sentences + "");
 
-            TextView textViewRows4 = new TextView(activity);
-            textViewRows4.setText(annotations_once + "");
-
-            TextView textViewRows5 = new TextView(activity);
-            textViewRows5.setText(annotations_twice + "");
-
-            TextView textViewRows6 = new TextView(activity);
-            textViewRows6.setText(annotations_full + "");
-
-            tableRow = new TableRow(activity);
-            tableRow.addView(nameButton);
-            tableRow.addView(textViewRows7);
-            tableRow.addView(textViewRows1);
-            tableRow.addView(textViewRows2);
-            tableRow.addView(textViewRows3);
-            tableRow.addView(textViewRows4);
-            tableRow.addView(textViewRows5);
-            tableRow.addView(textViewRows6);
-            tableLayout.addView(tableRow);
+                tableRow = new TableRow(activity);
+                tableRow.addView(nameButton);
+                tableRow.addView(textViewRows1);
+                tableRow.addView(textViewRows2);
+                tableRow.addView(textViewRows3);
+                tableRow.addView(textViewRows4);
+                tableLayout.addView(tableRow);
+            }
         }
 
         ScrollView scrollView = rootView.findViewById(R.id.dataset_scrollview);

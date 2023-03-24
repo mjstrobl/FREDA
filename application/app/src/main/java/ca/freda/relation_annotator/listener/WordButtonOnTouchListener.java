@@ -20,19 +20,15 @@ public class WordButtonOnTouchListener implements View.OnTouchListener {
         System.out.println("on touch: " + event);
         final int action = event.getAction();
 
-        // Handles each of the expected events
         switch(action) {
 
             case MotionEvent.ACTION_CANCEL: {
-                //mainActivity.removeEntityButton();
                 return true;
             }
             case MotionEvent.ACTION_UP: {
-                //mainActivity.wordButtonDragEnded();
                 return true;
             }
             case MotionEvent.ACTION_DOWN: {
-                //mainActivity.addEntityButtons();
                 ClipData item = ClipData.newPlainText("wordview_" + v.getTag(), "" + v.getTag());
                 System.out.println("Item in action down: " + item);
                 View.DragShadowBuilder myShadow = new WordButtonDragShadowBuilder(v);

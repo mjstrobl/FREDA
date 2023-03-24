@@ -2,11 +2,7 @@ package ca.freda.relation_annotator.data;
 
 import java.util.*;
 
-
-
 public class Data {
-
-
     private String sentence;
     private List<Entity> entities;
     private List<Map<String,Object>> words;
@@ -29,22 +25,6 @@ public class Data {
         return entities.size();
     }
 
-
-
-    public void addEntity(int colour, List<Position> positions, String wikiName) {
-        Entity entity = new Entity(colour,positions, wikiName);
-        entity.findName(this);
-        entities.add(entity);
-
-        Collections.sort(entities, new Comparator<Entity>() {
-
-            public int compare(Entity o1, Entity o2) {
-                return Integer.compare(o1.getPositions().get(0).start,o2.getPositions().get(0).start);
-            }
-        });
-
-    }
-
     public Entity addEntity(int colour, EntityButtonProperty property, List<Position> positions) {
         Entity entity = new Entity(colour,property,positions);
         entity.findName(this);
@@ -57,16 +37,6 @@ public class Data {
             }
         });
         return entity;
-    }
-
-    public int findIndexForEntity(Entity entity) {
-        System.out.println("WE have no. entities: " + entities.size());
-        for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i) == entity) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public void createAnnotations() {

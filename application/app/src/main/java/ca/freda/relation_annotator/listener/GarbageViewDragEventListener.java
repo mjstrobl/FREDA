@@ -14,27 +14,17 @@ public class GarbageViewDragEventListener implements View.OnDragListener {
         this.annotationFragment = annotationFragment;
     }
 
-    // This is the method that the system calls when it dispatches a drag event to the
-    // listener.
     public boolean onDrag(View v, DragEvent event) {
 
-        //System.out.println(event);
-
-        // Defines a variable to store the action type for the incoming event
         final int action = event.getAction();
-
-        // Handles each of the expected events
         switch(action) {
 
             case DragEvent.ACTION_DRAG_STARTED: {
                 System.out.println("ACTION_DRAG_STARTED in GarbageViewDragEventListener");
                 String text = (String)event.getClipDescription().getLabel();
                 System.out.println(text);
-                //if (text.contains("entity")) {
-                    v.invalidate();
-                    return true;
-                //}
-                //return false;
+                v.invalidate();
+                return true;
             }
 
             case DragEvent.ACTION_DRAG_ENTERED:
@@ -45,8 +35,6 @@ public class GarbageViewDragEventListener implements View.OnDragListener {
                 return true;
 
             case DragEvent.ACTION_DRAG_LOCATION:
-                //System.out.println("ACTION_DRAG_LOCATION");
-                // Ignore the event
                 return true;
 
             case DragEvent.ACTION_DRAG_EXITED:
@@ -58,7 +46,6 @@ public class GarbageViewDragEventListener implements View.OnDragListener {
 
             case DragEvent.ACTION_DROP:
                 System.out.println("ACTION_DROP");
-                // Gets the item containing the dragged data
                 String text = (String)event.getClipDescription().getLabel();
                 String[] tokens = text.split("_");
                 System.out.println("Item text: " + text);
@@ -78,7 +65,6 @@ public class GarbageViewDragEventListener implements View.OnDragListener {
                 v.setBackgroundColor(Color.LTGRAY);
                 return true;
 
-            // An unknown action type was received.
             default:
                 System.out.println("Unknown action type received by OnDragListener.");
                 break;

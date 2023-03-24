@@ -12,7 +12,6 @@ import java.util.Set;
 public class Entity {
 
     private List<Position> positions;
-    private List<Position> textviewTextPositions;
     private String name;
     private EntityButtonProperty property;
     private int colour;
@@ -26,11 +25,6 @@ public class Entity {
         this.colour = colour;
         this.positions = positions;
         this.property = property;
-    }
-
-    public Entity(int colour, List<Position> positions, String wikiName) {
-        this.colour = colour;
-        this.positions = positions;
     }
 
     public void increaseProperty() {
@@ -69,7 +63,6 @@ public class Entity {
                 System.out.println("first word: " + firstWord);
                 System.out.println("second word: " + secondWord);
 
-                //if (restrictedWords.contains(firstWord) || restrictedWords.contains(secondWord)) {
                 if (restrictedWords.contains(secondWord)) {
                     continue;
                 }
@@ -91,6 +84,7 @@ public class Entity {
 
         for (Position position : positions) {
             String currentName = data.getSentence().substring(position.start, position.start + position.length);
+            System.out.println(currentName);
             if (currentName.length() > bestName.length() && Utils.checkStringForUppercase(currentName)) {
                 bestName = currentName;
             }
@@ -98,6 +92,7 @@ public class Entity {
         if (bestName.length() == 0) {
             for (Position position : positions) {
                 String currentName = data.getSentence().substring(position.start, position.start + position.length);
+                System.out.println(currentName);
                 if (currentName.length() > bestName.length()) {
                     bestName = currentName;
                 }
@@ -106,10 +101,6 @@ public class Entity {
 
         name = bestName;
     }
-
-    /*public String getWikiName() {
-        return wikiName;
-    }*/
 
     public void setPositions(List<Position> positions, Data data) {
         this.positions = positions;
@@ -124,23 +115,11 @@ public class Entity {
         return property;
     }
 
-    public void setProperty(EntityButtonProperty property) {
-        this.property = property;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Position> getTextviewTextPositions() {
-        return textviewTextPositions;
-    }
-
-    public void setTextviewTextPositions(List<Position> textviewTextPositions) {
-        this.textviewTextPositions = textviewTextPositions;
     }
 }
