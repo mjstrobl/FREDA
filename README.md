@@ -1,6 +1,6 @@
 # IMPORTANT
 
-This is still in progress and will change up until the conference end of March 2023. See branch thesis for a working version. Unfortunately, the app is not yet available in the Play Store, will come soon though.
+This is still in progress and I will update this repository soon after the conference (ACM SAC 2023). See branch thesis for a working version. Unfortunately, the app is not yet available in the Play Store, will come sometime in April 2023 though.
 
 # FREDA
 
