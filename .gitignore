@@ -1,4 +1,3 @@
-database/*
 *.json
 .idea/
 nyt/*
@@ -10,7 +9,7 @@ application/app/libs/*.jar
 application/setuptools-33.1.1.zip
 application/amplify/
 application/setup.py
-
+database/datacreator.py
 application/app/build.gradle
 application/app/proguard-rules.pro
 application/build.gradle
