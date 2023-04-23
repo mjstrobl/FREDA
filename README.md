@@ -11,7 +11,7 @@ See our paper on Arxiv (published in the Knowledge and Natural Language Processi
 
 FREDA can be used to manually annotate sentences quickly and accurately. A simple procedure for sentence acquisition from a partially annotated Wikipedia-based corpus is provided to be able to create datasets for new relations.
 
-Current database (`database/*.jsonl`) contains at least 500 annotated sentences for 19 relations. In addition, four more relations are added without any annotations so far.
+Current database (`database/*.jsonl`) contains at least 500 annotated sentences for 19 relations.
 
 Each file contains data for a specific relation (see filename) and each line consists of:
 
@@ -20,6 +20,8 @@ Each file contains data for a specific relation (see filename) and each line con
 - subjects: indexes of entities
 - objects: indexes of entities
 - response: 1 for relation holds between subjects and objects, 0 if not (subjects and objects irrelevant)
+
+FYI in case a model is trained on these datasets, which takes a single subject/object pair as input (that's what we did in the paper): Since there are potentially multiple subjects and objects, as well as each entity may contain multiple positions, many more samples for model training can be extracted from these datasets than just the ~500 sentences, which are annotated per relation.
 
 # Acknowledgements
 
