@@ -26,3 +26,7 @@ FYI in case a model is trained on these datasets, which takes a single subject/o
 # Acknowledgements
 
 We would like to thank all the data annotators for their hard work towards creating these datasets.
+
+# Comments
+
+In case you are interested in the state of the repository based on Michael Strobl's PhD thesis, please checkout the "thesis" branch.
