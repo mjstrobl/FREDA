@@ -1,6 +1,6 @@
 # IMPORTANT
 
-This is still in progress and I will update this repository soon after the conference (ACM SAC 2023). See branch thesis for a working version. Unfortunately, the app is not yet available in the Play Store, will come sometime in April 2023 though.
+This is still in progress and I will update this repository soon after the conference (ACM SAC 2023). Unfortunately, the app is not yet available in the Play Store, will come sometime in April 2023 though.
 
 # FREDA
 
@@ -9,7 +9,7 @@ Fast Relation Extraction Data Annotation
 See our paper on Arxiv (published in the Knowledge and Natural Language Processing track at ACM SAC
 2023): https://arxiv.org/abs/2204.07150
 
-FREDA can be used to manually annotate sentences quickly and accurately. A simple procedure for sentence acquisition from a partially annotated Wikipedia-based corpus is provided to be able to create datasets for new relations.
+FREDA can be used to manually annotate sentences quickly and accurately.
 
 Current database (`database/*.jsonl`) contains at least 500 annotated sentences for 19 relations.
 
@@ -40,7 +40,7 @@ In case you want to run your own version for FREDA in the cloud, please follow t
 - Create a table (dataset name) in DynamoDB with `sentence` as partition key and the following fields. This dataset can be used for multiple relations, the corresponding tables in RDS simply need to contain the partition key.
 
 ![alt text](figures/dynamodb.png)
-- Create a database in AWS RDS and one table per relation with the following columns. The table name should be <dataset name>_<relation>. The sentence column contains the partition keys in DynamoDB.
+- Create a database in AWS RDS and one table per relation with the following columns. The table name should be `<dataset name>_<relation>`. The sentence column contains the partition keys in DynamoDB.
 
 ![alt text](figures/rds.png)
 
