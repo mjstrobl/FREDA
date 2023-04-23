@@ -1,6 +1,6 @@
 # IMPORTANT
 
-This is still in progress and will change up until the conference end of March 2023.
+Please consider the main branch for the most up to date state of the app. This branch is mainly for archival purposes.
 
 # FREDA
 
