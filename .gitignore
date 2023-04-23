@@ -3,7 +3,13 @@ database/*
 .idea/
 nyt/*
 main.db
-
+data/
+do_not_commit/*.py
+libraries/
+application/app/libs/*.jar
+application/setuptools-33.1.1.zip
+application/amplify/
+application/setup.py
 
 application/app/build.gradle
 application/app/proguard-rules.pro
