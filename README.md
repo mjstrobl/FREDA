@@ -1,7 +1,3 @@
-# IMPORTANT
-
-This is still in progress and I will update this repository soon after the conference (ACM SAC 2023). See branch thesis for a working version. Unfortunately, the app is not yet available in the Play Store, will come sometime in April 2023 though.
-
 # FREDA
 
 Fast Relation Extraction Data Annotation
@@ -14,6 +10,12 @@ FREDA can be used to manually annotate sentences quickly and accurately. A simpl
 In addition, FREDA can also be used to annotate datasets for the tasks Named Entity Recognition, Co-reference Resolution and Entity Linking.
 
 Current database (`database/main.tar.xz`) contains at least 500 annotated sentences for 19 relations. In addition, four more relations are added without any annotations so far.
+
+# Android app
+
+Please check out the app in the Playstore: https://play.google.com/store/apps/details?id=ca.freda.relation_annotator
+
+Email mstrobl@ualberta.ca for an account.
 
 # Acknowledgements
 
